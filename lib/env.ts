@@ -6,8 +6,8 @@ const REQUIRED_ENV_VARS = {
 
 const OPTIONAL_ENV_VARS = {
   GEMINI_API_KEY: process.env.GEMINI_API_KEY,
-  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
-  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+  PAYSTACK_SECRET_KEY: process.env.PAYSTACK_SECRET_KEY,
+  NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
 };
 
 export function validateEnv() {
@@ -48,10 +48,10 @@ export function getGeminiApiKey(): string {
   return key;
 }
 
-export function getStripeSecretKey(): string {
-  const key = process.env.STRIPE_SECRET_KEY;
+export function getPaystackSecretKey(): string {
+  const key = process.env.PAYSTACK_SECRET_KEY;
   if (!key) {
-    throw new Error("STRIPE_SECRET_KEY is not set. Payment features are disabled.");
+    throw new Error("PAYSTACK_SECRET_KEY is not set. Payment features are disabled.");
   }
   return key;
 }

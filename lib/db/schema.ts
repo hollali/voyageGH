@@ -46,6 +46,7 @@ export const bookings = pgTable("bookings", {
   userId: text("user_id").notNull().references(() => users.id),
   tripId: integer("trip_id").notNull().references(() => trips.id),
   status: varchar("status", { length: 20 }).notNull().default("pending"),
+  paymentLink: varchar("payment_link", { length: 255 }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

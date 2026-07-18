@@ -44,10 +44,17 @@ describe("env validation", () => {
     expect(getGeminiApiKey()).toBe("test-key-123");
   });
 
-  it("getStripeSecretKey throws when not set", async () => {
-    delete process.env.STRIPE_SECRET_KEY;
+  it("getPaystackSecretKey throws when not set", async () => {
+    delete process.env.PAYSTACK_SECRET_KEY;
 
-    const { getStripeSecretKey } = await import("../lib/env");
-    expect(() => getStripeSecretKey()).toThrow(/STRIPE_SECRET_KEY is not set/);
+    const { getPaystackSecretKey } = await import("../lib/env");
+    expect(() => getPaystackSecretKey()).toThrow(/PAYSTACK_SECRET_KEY is not set/);
+  });
+
+  it("getPaystackSecretKey returns key when set", async () => {
+    process.env.PAYSTACK_SECRET_KEY = "sk_test_xxx";
+
+    const { getPaystackSecretKey } = await import("../lib/env");
+    expect(getPaystackSecretKey()).toBe("sk_test_xxx");
   });
 });

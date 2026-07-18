@@ -340,7 +340,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
                   </div>
                 </div>
 
-                <BookingButton tripId={trip.id} userId={userId} />
+                <BookingButton tripId={trip.id} userId={userId} tripName={trip.name} price={trip.estimatedPrice || ""} />
 
                 <p className="text-xs text-gray-100 text-center mt-3">
                   Free cancellation up to 48 hours before departure

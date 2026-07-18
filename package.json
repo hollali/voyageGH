@@ -20,16 +20,15 @@
     "@clerk/nextjs": "^7.5.20",
     "@google/generative-ai": "^0.24.0",
     "@neondatabase/serverless": "^0.10.4",
-    "@stripe/stripe-js": "^6.1.0",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
     "next": "^15.3.4",
+    "paystack-api": "^2.0.6",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "recharts": "^3.9.2",
-    "stripe": "^18.2.1",
     "tailwind-merge": "^3.3.0"
   },
   "devDependencies": {
