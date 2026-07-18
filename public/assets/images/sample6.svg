@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250">
+  <rect width="400" height="250" fill="#f9fbfc"/>
+  <rect x="0" y="0" width="133" height="250" fill="#CE1126" opacity="0.15"/>
+  <rect x="133" y="0" width="134" height="250" fill="#FFD700" opacity="0.15"/>
+  <rect x="267" y="0" width="133" height="250" fill="#006B3F" opacity="0.15"/>
+  <text x="200" y="120" text-anchor="middle" font-family="Figtree, sans-serif" font-size="24" fill="#1f1f36">Diaspora Heritage</text>
+  <text x="200" y="148" text-anchor="middle" font-family="Figtree, sans-serif" font-size="14" fill="#7f7e83">Year of Return Journey</text>
+</svg>

@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import dayjs from "dayjs";
+import type { TrendResult } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -26,10 +27,9 @@ export function parseMarkdownToJson(markdownText: string): unknown | null {
   return null;
 }
 
-export function parseTripData(jsonString: string): Trip | null {
+export function parseTripData(jsonString: string) {
   try {
-    const data: Trip = JSON.parse(jsonString);
-
+    const data = JSON.parse(jsonString);
     return data;
   } catch (error) {
     console.error("Failed to parse trip data:", error);
@@ -63,7 +63,7 @@ export const calculateTrendPercentage = (
   }
 };
 
-export const formatKey = (key: keyof TripFormData) => {
+export const formatKey = (key: string) => {
   return key
     .replace(/([A-Z])/g, " $1")
     .replace(/^./, (str) => str.toUpperCase());

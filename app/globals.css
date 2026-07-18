@@ -1,11 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
-@import "../node_modules/@syncfusion/ej2-base/styles/material.css";
-@import "../node_modules/@syncfusion/ej2-react-buttons/styles/material.css";
-@import "../node_modules/@syncfusion/ej2-react-grids/styles/material.css";
-@import "../node_modules/@syncfusion/ej2-react-navigations/styles/material.css";
-@import "../node_modules/@syncfusion/ej2-react-splitbuttons/styles/material.css";
-@import "../node_modules/@syncfusion/ej2-react-dropdowns/styles/material.css";
 @import "tailwindcss";
 
 @theme {
@@ -73,7 +67,7 @@
     @apply text-red-500 text-base font-medium text-center;
   }
   .all-users {
-    @apply w-full min-h-screen  flex flex-col gap-10;
+    @apply w-full min-h-screen flex flex-col gap-10;
   }
 
   .stats-card {
@@ -310,7 +304,7 @@
     }
   }
   .root-nav {
-    @apply flex justify-between gap-4  items-center;
+    @apply flex justify-between gap-4 items-center;
     a {
       @apply flex items-center gap-1.5 py-10;
       h1 {
@@ -366,11 +360,11 @@
   }
 
   .status-column {
-    @apply flex justify-center items-center gap-1 w-[65px] py-[2px]  rounded-2xl mix-blend-multiply;
+    @apply flex justify-center items-center gap-1 w-[65px] py-[2px] rounded-2xl mix-blend-multiply;
   }
 
   .dashboard {
-    @apply flex flex-col gap-10 w-full  pb-20;
+    @apply flex flex-col gap-10 w-full pb-20;
 
     .container {
       @apply flex flex-col gap-5 mt-2.5;
@@ -423,7 +417,7 @@
     @apply text-lg md:text-2xl font-semibold;
   }
   .p-20-semibold {
-    @apply text-base md:text-[20xp] md:leading-7 font-semibold;
+    @apply text-base md:text-[20px] md:leading-7 font-semibold;
   }
   .p-18-bold {
     @apply text-[14px] md:text-[18px] leading-[14px] md:leading-[16px] font-bold;
@@ -482,63 +476,43 @@ body {
   -webkit-backdrop-filter: blur(2px);
 }
 
-/* ======== css overrides for syncfusion ========= */
-.e-grid,
-.e-table {
-  border-color: #eef9ff !important;
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-.e-control {
-  border-radius: 12px !important;
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
 }
 
-.e-grid .e-gridheader {
-  border-color: #eef9ff !important;
-  border-radius: 12px 12px 0 0 !important;
+/* Responsive table wrapper */
+.table-responsive {
+  @apply w-full overflow-x-auto;
 }
 
-.e-grid .e-row:nth-child(odd) {
-  background-color: #f9fbfc;
+/* Focus visible styles for accessibility */
+:focus-visible {
+  @apply outline-2 outline-offset-2 outline-primary-100;
 }
 
-.e-grid .e-rowcell {
-  padding-top: 18px !important;
-  padding-bottom: 18px !important;
+/* Smooth page transitions */
+main {
+  @apply w-full;
 }
 
-.e-sidebar.e-left {
-  border-right: 1px solid #ecf2ef;
-}
-.e-btn,
-.e-css.e-btn {
-  text-transform: none;
-}
-.e-dropdown-btn {
-  border-radius: 6px;
-  border: 1px solid #f0fef9;
-  background: #ffffff;
-  box-shadow:
-    0px 0px 3px 0px rgba(16, 24, 40, 0.1),
-    0px 0px 2px 0px rgba(16, 24, 40, 0.06);
-  height: 40px;
+/* Loading spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.e-dropdown-popup ul {
-  border-radius: 8px;
-  border: 1px solid #eaecf0;
-  background: #fff;
-  box-shadow:
-    0px 12px 16px -4px rgba(16, 24, 40, 0.1),
-    0px 4px 20px -2px rgba(16, 24, 40, 0.2);
-}
-.e-dropdown-popup ul .e-item {
-  padding-left: 36px;
-  padding-right: 36px;
-}
-/* e-input-group-icon e-ddl-icon e-search-icon */
-
-.e-input-group-icon {
-  position: absolute;
-  top: 45px;
-  right: 40px;
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
