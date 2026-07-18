@@ -4,13 +4,61 @@ import { auth } from "@clerk/nextjs/server";
 import { Header } from "~/components/Header";
 import { Footer } from "~/components/Footer";
 import { getTripById, getReviewsByTrip, getAverageRating } from "~/lib/actions";
+import { DUMMY_TRIPS } from "~/lib/constants";
 import { notFound } from "next/navigation";
 import { BookingButton } from "~/components/BookingButton";
 import { ReviewForm } from "~/components/ReviewForm";
 
+async function findTrip(id: number) {
+  try {
+    const trip = await getTripById(id);
+    if (trip) return trip;
+  } catch {
+    // DB unavailable — fall back to static data
+  }
+  const dummy = DUMMY_TRIPS.find((t) => t.id === id);
+  if (!dummy) return null;
+  // Normalize dummy trip to match DB shape
+  return {
+    id: dummy.id,
+    name: dummy.name,
+    description: dummy.description,
+    estimatedPrice: dummy.estimatedPrice,
+    duration: dummy.duration,
+    budget: dummy.budget,
+    travelStyle: dummy.travelStyle,
+    interests: dummy.interests,
+    groupType: dummy.groupType,
+    country: dummy.itinerary[0]?.location || "Ghana",
+    imageUrls: dummy.imageUrls,
+    itinerary: [] as { day: number; location: string; activities: { time: string; description: string }[] }[],
+    bestTimeToVisit: [] as string[],
+    weatherInfo: [] as string[],
+    location: null,
+    paymentLink: null,
+    createdAt: new Date(),
+  };
+}
+
+async function findReviews(tripId: number) {
+  try {
+    return await getReviewsByTrip(tripId);
+  } catch {
+    return [];
+  }
+}
+
+async function findRating(tripId: number) {
+  try {
+    return await getAverageRating(tripId);
+  } catch {
+    return { avgRating: 0, totalReviews: 0 };
+  }
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const trip = await getTripById(Number(id));
+  const trip = await findTrip(Number(id));
   return {
     title: trip ? `${trip.name} | VoyageGH` : "Trip Not Found | VoyageGH",
     description: trip?.description || "Ghana trip details",
@@ -19,236 +67,320 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function TripDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const trip = await getTripById(Number(id));
-
+  const trip = await findTrip(Number(id));
   if (!trip) notFound();
 
-  const { userId } = await auth();
+  const { userId } = await auth().catch(() => ({ userId: null }));
   const [tripReviews, avgRating] = await Promise.all([
-    getReviewsByTrip(trip.id),
-    getAverageRating(trip.id),
+    findReviews(trip.id),
+    findRating(trip.id),
   ]);
 
+  const galleryImages = trip.imageUrls && trip.imageUrls.length > 0
+    ? trip.imageUrls
+    : ["/assets/images/ghana/accra-city.jpg"];
+
+  const heroImage = galleryImages[0];
+  const thumbnailImages = galleryImages.slice(1);
+
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-light-200">
       <Header />
 
-      <main className="wrapper py-10 flex-1">
-        <div className="travel-detail">
-          {/* Back Link */}
-          <Link href="/trips" className="back-link w-fit">
-            <Image src="/assets/icons/arrow-left.svg" alt="back" width={17} height={17} />
-            <span>Back to Trips</span>
+      {/* Hero Image */}
+      <div className="relative w-full h-[300px] md:h-[420px]">
+        <Image
+          src={heroImage}
+          alt={trip.name}
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 wrapper py-8">
+          <Link
+            href="/trips"
+            className="inline-flex items-center gap-2 text-white/80 text-sm mb-4 hover:text-white transition-colors"
+          >
+            <Image src="/assets/icons/arrow-left.svg" alt="back" width={16} height={16} className="brightness-0 invert" />
+            Back to Trips
           </Link>
-
-          {/* Title */}
-          <div className="title">
-            <article className="flex flex-col gap-4">
-              <h3 className="text-xl md:text-3xl text-dark-100 font-semibold">{trip.name}</h3>
-              <p className="text-base md:text-2xl text-gray-100 font-normal">
-                {trip.country || "Ghana"}
-              </p>
-            </article>
-            <h2 className="text-sm md:text-xl font-normal text-dark-100">{trip.estimatedPrice}</h2>
-          </div>
-
-          {/* Rating Summary */}
-          {avgRating && avgRating.totalReviews > 0 && (
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Image
-                    key={i}
-                    src="/assets/icons/star.svg"
-                    alt="star"
-                    width={18}
-                    height={18}
-                    className={i < Math.round(Number(avgRating.avgRating)) ? "opacity-100" : "opacity-30"}
-                  />
-                ))}
-              </div>
-              <span className="text-sm text-gray-100">
+          <h1 className="text-2xl md:text-4xl font-bold text-white mb-2">{trip.name}</h1>
+          <div className="flex items-center gap-4 flex-wrap">
+            <span className="flex items-center gap-1.5 text-white/90 text-sm">
+              <Image src="/assets/icons/location-mark.svg" alt="location" width={16} height={16} className="brightness-0 invert" />
+              {"country" in trip ? trip.country || "Ghana" : "Ghana"}
+            </span>
+            {avgRating && avgRating.totalReviews > 0 && (
+              <span className="flex items-center gap-1 text-white/90 text-sm">
+                <Image src="/assets/icons/star.svg" alt="star" width={14} height={14} className="brightness-0 invert" />
                 {Number(avgRating.avgRating).toFixed(1)} ({avgRating.totalReviews} reviews)
               </span>
-            </div>
-          )}
-
-          {/* Description */}
-          <div className="bg-white p-6 rounded-20 shadow-300">
-            <p className="text-dark-400 text-base leading-relaxed">{trip.description}</p>
+            )}
+            <span className="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs rounded-full font-medium">
+              {trip.travelStyle}
+            </span>
           </div>
+        </div>
+      </div>
 
-          {/* Image Gallery */}
-          {trip.imageUrls && trip.imageUrls.length > 0 && (
-            <div className="container">
-              <div className="gallery">
-                {trip.imageUrls.map((url, index) => (
-                  <div key={index} className="relative rounded-xl overflow-hidden">
+      <main className="wrapper py-10 flex-1">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content — 2/3 width */}
+          <div className="lg:col-span-2 flex flex-col gap-8">
+            {/* Thumbnail Gallery */}
+            {thumbnailImages.length > 0 && (
+              <div className="grid grid-cols-3 gap-3">
+                {thumbnailImages.map((url, index) => (
+                  <div key={index} className="relative rounded-xl overflow-hidden aspect-[4/3]">
                     <Image
                       src={url}
-                      alt={`${trip.name} ${index + 1}`}
-                      width={400}
-                      height={250}
-                      className="w-full h-full object-cover"
+                      alt={`${trip.name} ${index + 2}`}
+                      fill
+                      className="object-cover hover:scale-105 transition-transform duration-300"
                     />
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Trip Info */}
-          <div className="visit">
-            <div className="flex flex-col gap-4">
-              <h3 className="text-base md:text-xl text-dark-400 font-semibold">Trip Details</h3>
-              <ul className="flex flex-col gap-3">
-                {[
-                  ["Duration", `${trip.duration} days`],
-                  ["Budget", trip.budget],
-                  ["Travel Style", trip.travelStyle],
-                  ["Group Type", trip.groupType],
-                  ["Interests", trip.interests],
-                ].map(([label, value]) =>
-                  value ? (
-                    <li key={label} className="flex justify-between gap-7 text-sm md:text-lg font-normal text-dark-400 !list-disc">
-                      <span className="font-medium">{label}</span>
-                      <span>{value}</span>
-                    </li>
-                  ) : null
-                )}
-              </ul>
+            {/* Description */}
+            <div className="bg-white p-6 md:p-8 rounded-20 shadow-300">
+              <h2 className="text-lg font-semibold text-dark-100 mb-4">About This Trip</h2>
+              <p className="text-dark-400 text-base leading-relaxed">{trip.description}</p>
             </div>
-          </div>
 
-          {/* Itinerary */}
-          {trip.itinerary && trip.itinerary.length > 0 && (
-            <div className="container">
-              <h3 className="text-base md:text-xl text-dark-400 font-semibold">Day-by-Day Itinerary</h3>
-              <div className="itinerary">
-                {trip.itinerary.map((day) => (
-                  <li key={day.day} className="flex flex-col gap-4">
-                    <h3 className="text-base md:text-xl font-semibold text-dark-400">
-                      Day {day.day} — {day.location}
-                    </h3>
-                    <ul className="flex flex-col sm:gap-3 gap-7">
-                      {day.activities.map((activity, i) => (
-                        <li key={i} className="flex max-sm:flex-col flex-row justify-between sm:gap-7 gap-3 text-sm md:text-lg font-normal text-dark-400 !list-disc">
-                          <span className="w-[90px] font-medium">{activity.time}</span>
-                          <span className="flex-1">{activity.description}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Best Time to Visit */}
-          {trip.bestTimeToVisit && trip.bestTimeToVisit.length > 0 && (
-            <div className="bg-white p-6 rounded-20 shadow-300">
-              <h3 className="text-base md:text-xl text-dark-400 font-semibold mb-4">Best Time to Visit</h3>
-              <ul className="flex flex-col gap-2">
-                {trip.bestTimeToVisit.map((info, i) => (
-                  <li key={i} className="text-sm md:text-base text-dark-400 flex items-start gap-2">
-                    <span className="text-primary-100 mt-1">•</span>
-                    {info}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Weather Info */}
-          {trip.weatherInfo && trip.weatherInfo.length > 0 && (
-            <div className="bg-white p-6 rounded-20 shadow-300">
-              <h3 className="text-base md:text-xl text-dark-400 font-semibold mb-4">Weather Information</h3>
-              <ul className="flex flex-col gap-2">
-                {trip.weatherInfo.map((info, i) => (
-                  <li key={i} className="text-sm md:text-base text-dark-400 flex items-start gap-2">
-                    <span className="text-primary-100 mt-1">•</span>
-                    {info}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Tags */}
-          <div className="flex gap-2 flex-wrap">
-            {[trip.travelStyle, trip.budget, trip.groupType, trip.interests]
-              .filter((t): t is string => Boolean(t))
-              .flatMap((t) => t!.split(","))
-              .slice(0, 6)
-              .map((tag, index) => (
-                <span
-                  key={index}
-                  className="px-4 py-2 bg-light-500 text-primary-500 text-sm rounded-full font-medium"
-                >
-                  {tag.trim()}
-                </span>
+            {/* Trip Quick Info Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { icon: "📅", label: "Duration", value: `${trip.duration} days` },
+                { icon: "💰", label: "Budget", value: trip.budget },
+                { icon: "👥", label: "Group", value: trip.groupType },
+                { icon: "🎯", label: "Style", value: trip.travelStyle },
+              ].map((item) => (
+                <div key={item.label} className="bg-white p-4 rounded-20 shadow-300 text-center">
+                  <span className="text-2xl mb-2 block">{item.icon}</span>
+                  <p className="text-xs text-gray-100 mb-1">{item.label}</p>
+                  <p className="text-sm font-semibold text-dark-100">{item.value}</p>
+                </div>
               ))}
-          </div>
+            </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-4">
-            <BookingButton tripId={trip.id} userId={userId} />
-            <Link
-              href="/admin/create-trip"
-              className="px-8 py-3 border border-primary-100 text-primary-100 rounded-lg font-semibold hover:bg-primary-50 transition-colors"
-            >
-              Create Similar Trip
-            </Link>
-          </div>
+            {/* Day-by-Day Itinerary */}
+            {trip.itinerary && trip.itinerary.length > 0 && (
+              <div className="bg-white p-6 md:p-8 rounded-20 shadow-300">
+                <h2 className="text-lg font-semibold text-dark-100 mb-6">Day-by-Day Itinerary</h2>
+                <div className="relative">
+                  {/* Timeline line */}
+                  <div className="absolute left-[19px] top-0 bottom-0 w-[2px] bg-light-400" />
 
-          {/* Reviews Section */}
-          <div className="flex flex-col gap-6">
-            <h3 className="text-base md:text-xl text-dark-400 font-semibold">
-              Reviews ({tripReviews.length})
-            </h3>
+                  <div className="flex flex-col gap-8">
+                    {trip.itinerary.map((day) => (
+                      <div key={day.day} className="relative flex gap-5">
+                        {/* Day dot */}
+                        <div className="relative z-10 flex-shrink-0 w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-white text-sm font-bold">
+                          {day.day}
+                        </div>
 
-            {userId && <ReviewForm tripId={trip.id} userId={userId} />}
-
-            {tripReviews.length === 0 ? (
-              <p className="text-gray-100">No reviews yet. Be the first to review this trip!</p>
-            ) : (
-              <div className="flex flex-col gap-4">
-                {tripReviews.map(({ review, user }) => (
-                  <div key={review.id} className="bg-white p-6 rounded-20 shadow-300">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center text-primary-100 font-semibold text-sm">
-                        {user.name.charAt(0)}
+                        <div className="flex-1 pb-2">
+                          <h3 className="text-base font-semibold text-dark-100 mb-3">
+                            {day.location}
+                          </h3>
+                          <div className="flex flex-col gap-3">
+                            {day.activities.map((activity, i) => (
+                              <div key={i} className="flex gap-4 items-start">
+                                <span className="text-xs font-semibold text-primary-100 bg-primary-50 px-2 py-1 rounded-md whitespace-nowrap mt-0.5">
+                                  {activity.time}
+                                </span>
+                                <p className="text-sm text-dark-400 leading-relaxed">
+                                  {activity.description}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-dark-100">{user.name}</p>
-                        <p className="text-xs text-gray-100">
-                          {new Date(review.createdAt).toLocaleDateString("en-GB", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })}
-                        </p>
-                      </div>
-                      <div className="ml-auto flex gap-0.5">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <Image
-                            key={i}
-                            src="/assets/icons/star.svg"
-                            alt="star"
-                            width={14}
-                            height={14}
-                            className={i < Math.round(review.rating) ? "opacity-100" : "opacity-30"}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                    {review.comment && (
-                      <p className="text-sm text-dark-400">{review.comment}</p>
-                    )}
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
             )}
+
+            {/* Best Time to Visit */}
+            {trip.bestTimeToVisit && trip.bestTimeToVisit.length > 0 && (
+              <div className="bg-white p-6 md:p-8 rounded-20 shadow-300">
+                <h2 className="text-lg font-semibold text-dark-100 mb-4">Best Time to Visit</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {trip.bestTimeToVisit.map((info, i) => (
+                    <div key={i} className="flex items-start gap-3 p-3 bg-light-200 rounded-xl">
+                      <span className="text-primary-100 text-lg mt-0.5">●</span>
+                      <p className="text-sm text-dark-400 leading-relaxed">{info}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Weather Info */}
+            {trip.weatherInfo && trip.weatherInfo.length > 0 && (
+              <div className="bg-white p-6 md:p-8 rounded-20 shadow-300">
+                <h2 className="text-lg font-semibold text-dark-100 mb-4">Weather Information</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {trip.weatherInfo.map((info, i) => (
+                    <div key={i} className="flex items-start gap-3 p-3 bg-light-200 rounded-xl">
+                      <span className="text-lg mt-0.5">🌡️</span>
+                      <p className="text-sm text-dark-400 leading-relaxed">{info}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Tags */}
+            <div className="flex gap-2 flex-wrap">
+              {[trip.travelStyle, trip.budget, trip.groupType, trip.interests]
+                .filter((t): t is string => Boolean(t))
+                .flatMap((t) => t!.split(","))
+                .slice(0, 8)
+                .map((tag, index) => (
+                  <span
+                    key={index}
+                    className="px-4 py-2 bg-white text-primary-500 text-sm rounded-full font-medium shadow-300"
+                  >
+                    {tag.trim()}
+                  </span>
+                ))}
+            </div>
+
+            {/* Reviews Section */}
+            <div className="bg-white p-6 md:p-8 rounded-20 shadow-300">
+              <h2 className="text-lg font-semibold text-dark-100 mb-6">
+                Reviews ({tripReviews.length})
+              </h2>
+
+              {userId && <ReviewForm tripId={trip.id} userId={userId} />}
+
+              {tripReviews.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-100 mb-2">No reviews yet</p>
+                  <p className="text-sm text-gray-200">Be the first to review this trip!</p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {tripReviews.map(({ review, user }) => (
+                    <div key={review.id} className="border-b border-light-400 pb-4 last:border-0 last:pb-0">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-9 h-9 rounded-full bg-primary-50 flex items-center justify-center text-primary-100 font-semibold text-sm">
+                          {user.name.charAt(0)}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-dark-100">{user.name}</p>
+                          <p className="text-xs text-gray-100">
+                            {new Date(review.createdAt).toLocaleDateString("en-GB", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </p>
+                        </div>
+                        <div className="flex gap-0.5">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Image
+                              key={i}
+                              src="/assets/icons/star.svg"
+                              alt="star"
+                              width={12}
+                              height={12}
+                              className={i < Math.round(review.rating) ? "opacity-100" : "opacity-30"}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      {review.comment && (
+                        <p className="text-sm text-dark-400 ml-12">{review.comment}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Sidebar — 1/3 width (sticky booking card) */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-6 flex flex-col gap-6">
+              {/* Price & Book Card */}
+              <div className="bg-white p-6 rounded-20 shadow-400 border border-light-400">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <p className="text-xs text-gray-100 mb-1">Starting from</p>
+                    <p className="text-2xl font-bold text-dark-100">{trip.estimatedPrice}</p>
+                  </div>
+                  <span className="px-3 py-1.5 bg-success-50 text-success-700 text-xs rounded-full font-medium">
+                    Available
+                  </span>
+                </div>
+
+                <div className="flex flex-col gap-3 mb-6">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-100">Duration</span>
+                    <span className="font-medium text-dark-100">{trip.duration} days</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-100">Group Type</span>
+                    <span className="font-medium text-dark-100">{trip.groupType}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-100">Travel Style</span>
+                    <span className="font-medium text-dark-100">{trip.travelStyle}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-100">Budget</span>
+                    <span className="font-medium text-dark-100">{trip.budget}</span>
+                  </div>
+                </div>
+
+                <BookingButton tripId={trip.id} userId={userId} />
+
+                <p className="text-xs text-gray-100 text-center mt-3">
+                  Free cancellation up to 48 hours before departure
+                </p>
+              </div>
+
+              {/* Interests Card */}
+              {trip.interests && (
+                <div className="bg-white p-6 rounded-20 shadow-400 border border-light-400">
+                  <h3 className="text-sm font-semibold text-dark-100 mb-3">Interests</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {trip.interests.split(",").map((interest, i) => (
+                      <span
+                        key={i}
+                        className="px-3 py-1.5 bg-light-500 text-primary-500 text-xs rounded-full font-medium"
+                      >
+                        {interest.trim()}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Create Similar */}
+              <Link
+                href="/admin/create-trip"
+                className="flex items-center justify-center gap-2 px-6 py-3 border border-primary-100 text-primary-100 rounded-xl font-semibold hover:bg-primary-50 transition-colors text-sm"
+              >
+                <Image src="/assets/icons/magic-star.svg" alt="ai" width={18} height={18} />
+                Create Similar Trip with AI
+              </Link>
+
+              {/* Help Card */}
+              <div className="bg-primary-50 p-5 rounded-20 border border-primary-100/20">
+                <h3 className="text-sm font-semibold text-dark-100 mb-2">Need Help?</h3>
+                <p className="text-xs text-gray-100 leading-relaxed">
+                  Our travel experts can customize this itinerary for your group. Contact us for a personalized quote.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </main>

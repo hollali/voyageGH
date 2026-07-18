@@ -6,11 +6,25 @@ import Image from "next/image";
 import { Header } from "~/components/Header";
 import { Footer } from "~/components/Footer";
 import { TripCard } from "~/components/TripCard";
-import { ghanaRegions, travelStyles, budgetOptions } from "~/lib/constants";
-import type { Trip } from "~/lib/types";
+import { ghanaRegions, travelStyles, budgetOptions, DUMMY_TRIPS } from "~/lib/constants";
+
+interface TripListItem {
+  id: number;
+  name: string;
+  description: string;
+  imageUrls: string[];
+  travelStyle: string;
+  budget: string;
+  interests: string;
+  groupType: string;
+  duration: number;
+  estimatedPrice: string;
+  country?: string;
+  itinerary: { location: string }[];
+}
 
 export default function TripsPage() {
-  const [trips, setTrips] = useState<Trip[]>([]);
+  const [trips, setTrips] = useState<TripListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRegion, setSelectedRegion] = useState("");
@@ -28,15 +42,16 @@ export default function TripsPage() {
 
       const res = await fetch(`/api/trips?${params.toString()}`);
       const data = await res.json();
-      setTrips(data);
-    } catch (error) {
-      console.error("Failed to fetch trips:", error);
+      setTrips(data.length > 0 ? data : DUMMY_TRIPS);
+    } catch {
+      setTrips(DUMMY_TRIPS);
     } finally {
       setLoading(false);
     }
   }, [searchQuery, selectedRegion, selectedStyle, selectedBudget]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchTrips();
   }, [fetchTrips]);
 
