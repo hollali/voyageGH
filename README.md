@@ -45,19 +45,29 @@ Users can browse AI-generated trips, book adventures across all 16 regions of Gh
 - **AI Trip Generator** — Describe your preferences and get a custom Ghana itinerary powered by Google Gemini
 - **Browse Trips** — Search and filter trips by region, travel style, budget, and interests
 - **Trip Detail Pages** — Full day-by-day itinerary with photo gallery, weather info, and booking
-- **Book Trips** — One-click booking with status tracking
-- **Reviews & Ratings** — Rate and review trips you've experienced
+- **Book Trips** — One-click booking with duplicate prevention and status tracking
+- **Cancel Bookings** — Cancel pending bookings from your dashboard
+- **Reviews & Ratings** — Rate (1-5 stars) and review trips you've experienced
 - **User Dashboard** — View your bookings and quick actions
+- **Terms & Privacy** — Full terms and conditions and privacy policy pages
 
 ### For Admins
-- **Dashboard** — Real-time stats (users, trips, bookings) with Recharts analytics
-- **Trip Management** — View and manage all AI-generated itineraries
-- **User Management** — Monitor platform users
+- **Admin RBAC** — Role-based access control (only admin users can access admin routes)
+- **Dashboard** — Real-time stats with last-month trend comparison and Recharts analytics
+- **Trip Management** — View and delete AI-generated itineraries
+- **User Management** — Real user table with roles from database
+- **AI Trip Generator** — Generate and preview formatted itineraries with real Ghana images
 
 ### Technical
+- **Admin RBAC** — Role-based access control checks user status in database
+- **Rate Limiting** — In-memory rate limiter on AI, bookings, and reviews endpoints
+- **Input Validation** — Server-side validation on review ratings (1-5) and booking dedup
+- **Error Boundaries** — Custom error.tsx for app, admin, and public route groups
 - **Lazy DB Connection** — Builds successfully on Netlify without env vars at build time
 - **Resilient Data Loading** — Falls back to static data if database is unavailable
 - **Clerk Auth** — Secure authentication with protected routes and middleware
+- **OG/Twitter Meta** — Social sharing metadata for better link previews
+- **SEO** — robots.txt, sitemap.xml, and proper meta tags
 - **50 Unit Tests** — Pricing engine, utilities, constants, and env validation
 
 <p align="center">
@@ -190,39 +200,49 @@ voyageGH/
 ├── app/
 │   ├── (auth)/                 # Sign in / Sign up (Clerk)
 │   ├── (public)/
-│   │   ├── trips/              # Browse + trip detail with reviews
-│   │   └── dashboard/          # User dashboard (bookings)
+│   │   ├── trips/              # Browse + trip detail with reviews + loading
+│   │   ├── dashboard/          # User dashboard (bookings + cancel)
+│   │   ├── terms/              # Terms & Conditions
+│   │   └── privacy/            # Privacy Policy
 │   ├── admin/
-│   │   ├── dashboard/          # Stats + Recharts analytics
-│   │   ├── create-trip/        # AI trip generator
-│   │   ├── trips/              # Trip management
-│   │   └── users/              # User management
+│   │   ├── dashboard/          # Stats + real DB analytics
+│   │   ├── create-trip/        # AI trip generator (formatted preview)
+│   │   ├── trips/              # Trip management (with delete)
+│   │   └── users/              # Real user table
 │   ├── api/
-│   │   ├── ai/generate-trip    # Gemini AI endpoint
-│   │   ├── bookings/           # Booking CRUD
-│   │   ├── reviews/            # Review CRUD
+│   │   ├── admin/trips/[id]    # Trip delete (admin-only)
+│   │   ├── ai/generate-trip    # Gemini AI endpoint (auth + rate limited)
+│   │   ├── bookings/           # Booking CRUD (duplicate prevention)
+│   │   ├── bookings/[id]       # Cancel booking
+│   │   ├── reviews/            # Review CRUD (auth + validation)
 │   │   └── trips/              # Trip search/filter
-│   ├── layout.tsx              # Root (Clerk + Toast providers)
+│   ├── layout.tsx              # Root (Clerk + Toast + validateEnv)
+│   ├── robots.ts               # SEO robots
+│   ├── sitemap.ts              # SEO sitemap
+│   ├── error.tsx               # Global error boundary
 │   └── page.tsx                # Homepage
 ├── components/
 │   ├── BookingButton.tsx       # Auth-gated booking
+│   ├── CancelBookingButton.tsx # Cancel pending bookings
+│   ├── DeleteTripButton.tsx    # Admin trip delete with confirm
 │   ├── ReviewForm.tsx          # Star rating + comment
 │   ├── Skeletons.tsx           # Loading placeholders
 │   ├── Toast.tsx               # Notification system
-│   ├── Header.tsx              # Nav with Clerk auth
-│   ├── Sidebar.tsx             # Admin sidebar
+│   ├── Header.tsx              # Nav with Clerk auth (admin-only link)
+│   ├── Sidebar.tsx             # Admin sidebar (real user info)
 │   └── TripCard.tsx            # Trip card
 ├── lib/
-│   ├── actions.ts              # Server actions
+│   ├── actions.ts              # Server actions (RBAC, chart data, users)
 │   ├── constants.ts            # Ghana data + sample trips
 │   ├── env.ts                  # Env validation
 │   ├── pricing.ts              # Price calculator
+│   ├── rate-limit.ts           # In-memory rate limiter
 │   ├── types.ts                # TypeScript interfaces
 │   └── db/
 │       ├── index.ts            # Lazy Neon connection
 │       └── schema.ts           # Drizzle schema
 ├── scripts/
-│   └── seed.ts                 # DB seed script
+│   └── seed.ts                 # DB seed script (--dry-run)
 └── tests/                      # 50 Vitest tests
 ```
 
