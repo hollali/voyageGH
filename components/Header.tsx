@@ -6,7 +6,8 @@ import { SignInButton, UserButton } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
 
 export function Header() {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
+  const isAdmin = user?.publicMetadata?.role === "admin";
 
   return (
     <header className="root-nav wrapper">
@@ -29,12 +30,14 @@ export function Header() {
             >
               My Dashboard
             </Link>
-            <Link
-              href="/admin/dashboard"
-              className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-100 text-white text-sm font-semibold hover:bg-primary-500 transition-colors"
-            >
-              Admin
-            </Link>
+            {isAdmin && (
+              <Link
+                href="/admin/dashboard"
+                className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-100 text-white text-sm font-semibold hover:bg-primary-500 transition-colors"
+              >
+                Admin
+              </Link>
+            )}
             <UserButton
               appearance={{
                 elements: {

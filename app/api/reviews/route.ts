@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { createReview, getReviewsByTrip } from "~/lib/actions";
 
 export async function GET(request: NextRequest) {
@@ -18,13 +19,26 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { tripId, userId, rating, comment } = await request.json();
-    if (!tripId || !userId || !rating) {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { tripId, rating, comment } = await request.json();
+    if (!tripId || !rating) {
       return NextResponse.json(
-        { error: "tripId, userId, and rating are required" },
+        { error: "tripId and rating are required" },
         { status: 400 }
       );
     }
+
+    if (typeof rating !== "number" || rating < 1 || rating > 5) {
+      return NextResponse.json(
+        { error: "rating must be a number between 1 and 5" },
+        { status: 400 }
+      );
+    }
+
     const review = await createReview(userId, tripId, rating, comment);
     return NextResponse.json(review);
   } catch (error) {

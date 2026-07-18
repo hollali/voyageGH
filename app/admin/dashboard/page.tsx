@@ -1,8 +1,9 @@
+import { redirect } from "next/navigation";
 import { Sidebar, MobileSidebar } from "~/components/Sidebar";
 import { StatsCard } from "~/components/StatsCard";
 import { UserGrowthChart } from "~/components/charts/UserGrowthChart";
 import { TripDistributionChart } from "~/components/charts/TripDistributionChart";
-import { getDashboardStats, getRecentTrips } from "~/lib/actions";
+import { getDashboardStats, getRecentTrips, requireAdmin, getMonthlyGrowthData, getTripDistributionByGroupType } from "~/lib/actions";
 
 export const metadata = {
   title: "Admin Dashboard | VoyageGH",
@@ -10,8 +11,18 @@ export const metadata = {
 };
 
 export default async function AdminDashboardPage() {
-  const stats = await getDashboardStats();
-  const recentTrips = await getRecentTrips(5);
+  try {
+    await requireAdmin();
+  } catch {
+    redirect("/");
+  }
+
+  const [stats, recentTrips, growthData, distributionData] = await Promise.all([
+    getDashboardStats(),
+    getRecentTrips(5),
+    getMonthlyGrowthData(),
+    getTripDistributionByGroupType(),
+  ]);
 
   return (
     <div className="admin-layout">
@@ -31,25 +42,25 @@ export default async function AdminDashboardPage() {
               <StatsCard
                 headerTitle="Total Users"
                 total={stats.totalUsers}
-                lastMonthCount={0}
+                lastMonthCount={stats.usersLastMonth}
                 currentMonthCount={stats.usersThisMonth}
               />
               <StatsCard
                 headerTitle="Total Trips"
                 total={stats.totalTrips}
-                lastMonthCount={0}
+                lastMonthCount={stats.tripsLastMonth}
                 currentMonthCount={stats.tripsThisMonth}
               />
               <StatsCard
                 headerTitle="Active Bookings"
                 total={stats.totalBookings}
-                lastMonthCount={0}
+                lastMonthCount={stats.bookingsLastMonth}
                 currentMonthCount={stats.bookingsThisMonth}
               />
               <StatsCard
                 headerTitle="This Month"
                 total={stats.usersThisMonth + stats.tripsThisMonth + stats.bookingsThisMonth}
-                lastMonthCount={0}
+                lastMonthCount={stats.usersLastMonth + stats.tripsLastMonth + stats.bookingsLastMonth}
                 currentMonthCount={stats.usersThisMonth + stats.tripsThisMonth + stats.bookingsThisMonth}
               />
             </div>
@@ -60,11 +71,11 @@ export default async function AdminDashboardPage() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="bg-white p-6 rounded-20 shadow-400">
                   <h2 className="p-18-semibold text-dark-100 mb-4">User Growth</h2>
-                  <UserGrowthChart />
+                  <UserGrowthChart data={growthData} />
                 </div>
                 <div className="bg-white p-6 rounded-20 shadow-400">
                   <h2 className="p-18-semibold text-dark-100 mb-4">Trip Distribution</h2>
-                  <TripDistributionChart />
+                  <TripDistributionChart data={distributionData} />
                 </div>
               </div>
             </div>

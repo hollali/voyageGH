@@ -1,6 +1,9 @@
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
 import { Sidebar, MobileSidebar } from "~/components/Sidebar";
-import { TripCard } from "~/components/TripCard";
-import { getAllTrips } from "~/lib/actions";
+import { getAllTrips, requireAdmin } from "~/lib/actions";
+import { DeleteTripButton } from "~/components/DeleteTripButton";
 
 export const metadata = {
   title: "AI Trips | VoyageGH",
@@ -8,6 +11,12 @@ export const metadata = {
 };
 
 export default async function AdminTripsPage() {
+  try {
+    await requireAdmin();
+  } catch {
+    redirect("/");
+  }
+
   const allTrips = await getAllTrips();
 
   return (
@@ -34,18 +43,58 @@ export default async function AdminTripsPage() {
                 </a>
               </div>
             ) : (
-              <div className="trip-grid">
-                {allTrips.map((trip) => (
-                  <TripCard
-                    key={trip.id}
-                    id={trip.id}
-                    name={trip.name}
-                    location={trip.country || ""}
-                    imageUrl={trip.imageUrls?.[0] || "/assets/images/ghana/accra-city.jpg"}
-                    tags={[trip.travelStyle, trip.budget, trip.groupType].filter((t): t is string => Boolean(t))}
-                    price={trip.estimatedPrice || ""}
-                  />
-                ))}
+              <div className="bg-white rounded-20 shadow-400 overflow-hidden">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-light-400">
+                      <th className="text-left p-4 text-sm font-semibold text-dark-200">Trip</th>
+                      <th className="text-left p-4 text-sm font-semibold text-dark-200">Region</th>
+                      <th className="text-left p-4 text-sm font-semibold text-dark-200">Style</th>
+                      <th className="text-left p-4 text-sm font-semibold text-dark-200">Price</th>
+                      <th className="text-left p-4 text-sm font-semibold text-dark-200">Duration</th>
+                      <th className="text-right p-4 text-sm font-semibold text-dark-200">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allTrips.map((trip) => (
+                      <tr key={trip.id} className="border-b border-light-400 hover:bg-light-200 transition-colors">
+                        <td className="p-4">
+                          <div className="flex items-center gap-3">
+                            <Image
+                              src={trip.imageUrls?.[0] || "/assets/images/ghana/accra-city.jpg"}
+                              alt={trip.name}
+                              width={48}
+                              height={32}
+                              className="rounded-lg object-cover"
+                            />
+                            <div>
+                              <Link href={`/trips/${trip.id}`} className="text-sm font-medium text-dark-100 hover:text-primary-100 transition-colors">
+                                {trip.name}
+                              </Link>
+                              <p className="text-xs text-gray-100 line-clamp-1">{trip.description}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-4 text-sm text-gray-100">{trip.country}</td>
+                        <td className="p-4 text-sm text-gray-100">{trip.travelStyle}</td>
+                        <td className="p-4 text-sm text-gray-100">{trip.estimatedPrice}</td>
+                        <td className="p-4 text-sm text-gray-100">{trip.duration} days</td>
+                        <td className="p-4 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Link
+                              href={`/trips/${trip.id}`}
+                              className="p-2 rounded-lg hover:bg-light-200 transition-colors"
+                              title="View trip"
+                            >
+                              <Image src="/assets/icons/itinerary.svg" alt="view" width={16} height={16} />
+                            </Link>
+                            <DeleteTripButton tripId={trip.id} tripName={trip.name} />
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>

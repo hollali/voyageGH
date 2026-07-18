@@ -87,7 +87,7 @@ export const budgetOptions = ["Budget", "Mid-range", "Luxury", "Premium"];
 
 export const groupTypes = ["Solo", "Couple", "Family", "Friends", "Business", "Diaspora Visit"];
 
-export const footers = ["Terms & Condition", "Privacy Policy"];
+export const footers = ["Terms & Conditions", "Privacy Policy"];
 
 export const selectItems = ["groupType", "travelStyle", "interest", "budget"];
 

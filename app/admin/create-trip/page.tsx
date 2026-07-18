@@ -2,9 +2,22 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Sidebar, MobileSidebar } from "~/components/Sidebar";
 import { ghanaRegions, travelStyles, interests, budgetOptions, groupTypes } from "~/lib/constants";
 import type { TripFormData } from "~/lib/types";
+
+interface GeneratedTrip {
+  id?: number;
+  name?: string;
+  description?: string;
+  estimatedPrice?: string;
+  duration?: number;
+  country?: string;
+  travelStyle?: string;
+  budget?: string;
+  itinerary?: { day: number; location: string; activities: { time: string; description: string }[] }[];
+}
 
 export default function CreateTripPage() {
   const [formData, setFormData] = useState<TripFormData>({
@@ -16,7 +29,7 @@ export default function CreateTripPage() {
     groupType: "",
   });
   const [loading, setLoading] = useState(false);
-  const [generatedTrip, setGeneratedTrip] = useState(null);
+  const [generatedTrip, setGeneratedTrip] = useState<GeneratedTrip | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,8 +66,9 @@ export default function CreateTripPage() {
               {/* Form */}
               <form onSubmit={handleSubmit} className="trip-form">
                 <div className="flex flex-col gap-2.5 px-6">
-                  <label className="form-label">Region in Ghana</label>
+                  <label htmlFor="region" className="form-label">Region in Ghana</label>
                   <select
+                    id="region"
                     className="combo-box"
                     value={formData.country}
                     onChange={(e) => setFormData({ ...formData, country: e.target.value })}
@@ -68,8 +82,9 @@ export default function CreateTripPage() {
                 </div>
 
                 <div className="flex flex-col gap-2.5 px-6">
-                  <label className="form-label">Travel Style</label>
+                  <label htmlFor="travelStyle" className="form-label">Travel Style</label>
                   <select
+                    id="travelStyle"
                     className="combo-box"
                     value={formData.travelStyle}
                     onChange={(e) => setFormData({ ...formData, travelStyle: e.target.value })}
@@ -83,8 +98,9 @@ export default function CreateTripPage() {
                 </div>
 
                 <div className="flex flex-col gap-2.5 px-6">
-                  <label className="form-label">Interests</label>
+                  <label htmlFor="interest" className="form-label">Interests</label>
                   <select
+                    id="interest"
                     className="combo-box"
                     value={formData.interest}
                     onChange={(e) => setFormData({ ...formData, interest: e.target.value })}
@@ -98,8 +114,9 @@ export default function CreateTripPage() {
                 </div>
 
                 <div className="flex flex-col gap-2.5 px-6">
-                  <label className="form-label">Budget (GH₵)</label>
+                  <label htmlFor="budget" className="form-label">Budget (GH₵)</label>
                   <select
+                    id="budget"
                     className="combo-box"
                     value={formData.budget}
                     onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
@@ -113,8 +130,9 @@ export default function CreateTripPage() {
                 </div>
 
                 <div className="flex flex-col gap-2.5 px-6">
-                  <label className="form-label">Duration (days)</label>
+                  <label htmlFor="duration" className="form-label">Duration (days)</label>
                   <input
+                    id="duration"
                     type="number"
                     min={1}
                     max={30}
@@ -127,8 +145,9 @@ export default function CreateTripPage() {
                 </div>
 
                 <div className="flex flex-col gap-2.5 px-6">
-                  <label className="form-label">Group Type</label>
+                  <label htmlFor="groupType" className="form-label">Group Type</label>
                   <select
+                    id="groupType"
                     className="combo-box"
                     value={formData.groupType}
                     onChange={(e) => setFormData({ ...formData, groupType: e.target.value })}
@@ -167,9 +186,49 @@ export default function CreateTripPage() {
                 <h2 className="p-18-semibold text-dark-100 mb-4">Preview</h2>
                 {generatedTrip ? (
                   <div className="flex flex-col gap-4">
-                    <pre className="text-sm text-gray-100 overflow-auto max-h-[500px]">
-                      {JSON.stringify(generatedTrip, null, 2)}
-                    </pre>
+                    <div className="bg-primary-100/5 border border-primary-100/20 rounded-xl p-4">
+                      <h3 className="text-lg font-bold text-dark-100">{generatedTrip.name}</h3>
+                      <p className="text-sm text-gray-100 mt-1">{generatedTrip.description}</p>
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {generatedTrip.estimatedPrice && (
+                          <span className="px-3 py-1 bg-primary-100/10 text-primary-100 text-xs rounded-full font-medium">{generatedTrip.estimatedPrice}</span>
+                        )}
+                        {generatedTrip.duration && (
+                          <span className="px-3 py-1 bg-light-500 text-gray-100 text-xs rounded-full font-medium">{generatedTrip.duration} days</span>
+                        )}
+                        {generatedTrip.travelStyle && (
+                          <span className="px-3 py-1 bg-light-500 text-gray-100 text-xs rounded-full font-medium">{generatedTrip.travelStyle}</span>
+                        )}
+                        {generatedTrip.country && (
+                          <span className="px-3 py-1 bg-light-500 text-gray-100 text-xs rounded-full font-medium">{generatedTrip.country}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {generatedTrip.itinerary && generatedTrip.itinerary.length > 0 && (
+                      <div className="flex flex-col gap-3">
+                        <h4 className="font-semibold text-dark-100">Itinerary</h4>
+                        {generatedTrip.itinerary.map((day) => (
+                          <div key={day.day} className="border border-light-400 rounded-lg p-3">
+                            <p className="font-semibold text-dark-100 text-sm">Day {day.day} — {day.location}</p>
+                            {day.activities?.map((act, i) => (
+                              <p key={i} className="text-xs text-gray-100 mt-1">
+                                <span className="font-medium text-dark-200">{act.time}:</span> {act.description}
+                              </p>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {generatedTrip.id && (
+                      <Link
+                        href={`/trips/${generatedTrip.id}`}
+                        className="text-center py-2.5 bg-primary-100 text-white rounded-lg font-semibold hover:bg-primary-500 transition-colors text-sm"
+                      >
+                        View Full Trip
+                      </Link>
+                    )}
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-[400px] text-gray-100">

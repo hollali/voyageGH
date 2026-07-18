@@ -9,7 +9,7 @@ interface ReviewFormProps {
   userId: string;
 }
 
-export function ReviewForm({ tripId, userId }: ReviewFormProps) {
+export function ReviewForm({ tripId }: ReviewFormProps) {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,7 +23,7 @@ export function ReviewForm({ tripId, userId }: ReviewFormProps) {
       const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tripId, userId, rating, comment }),
+        body: JSON.stringify({ tripId, rating, comment }),
       });
 
       if (!res.ok) throw new Error("Failed to submit review");

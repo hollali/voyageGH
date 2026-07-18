@@ -11,7 +11,7 @@ export function Footer() {
         </Link>
         <div className="flex items-center gap-2 sm:gap-5">
           <Link href="/terms" className="text-sm md:text-base font-normal text-gray-100 hover:text-dark-100 transition-colors">
-            Terms & Condition
+            Terms &amp; Conditions
           </Link>
           <Link href="/privacy" className="text-sm md:text-base font-normal text-gray-100 hover:text-dark-100 transition-colors">
             Privacy Policy

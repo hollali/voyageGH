@@ -1,8 +1,27 @@
 "use server";
 
 import { eq, desc, like, and, sql, count } from "drizzle-orm";
+import { auth } from "@clerk/nextjs/server";
 import { db } from "~/lib/db";
 import { trips, bookings, reviews, users } from "~/lib/db/schema";
+
+// ===== AUTH HELPERS =====
+
+export async function requireAdmin() {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  if (!user || user.status !== "admin") throw new Error("Forbidden");
+  return user;
+}
+
+export async function getCurrentUser() {
+  const { userId } = await auth();
+  if (!userId) return null;
+  const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  return user || null;
+}
 
 // ===== TRIPS =====
 
@@ -152,6 +171,12 @@ export async function getAverageRating(tripId: number) {
   return result[0];
 }
 
+// ===== USERS =====
+
+export async function getAllUsers() {
+  return db.select().from(users).orderBy(desc(users.joinedAt));
+}
+
 // ===== DASHBOARD STATS =====
 
 export async function getDashboardStats() {
@@ -162,6 +187,9 @@ export async function getDashboardStats() {
   const currentMonth = new Date();
   currentMonth.setDate(1);
   currentMonth.setHours(0, 0, 0, 0);
+
+  const lastMonth = new Date(currentMonth);
+  lastMonth.setMonth(lastMonth.getMonth() - 1);
 
   const [usersThisMonth] = await db
     .select({ count: count() })
@@ -178,6 +206,21 @@ export async function getDashboardStats() {
     .from(bookings)
     .where(sql`${bookings.createdAt} >= ${currentMonth}`);
 
+  const [usersLastMonth] = await db
+    .select({ count: count() })
+    .from(users)
+    .where(sql`${users.joinedAt} >= ${lastMonth} AND ${users.joinedAt} < ${currentMonth}`);
+
+  const [tripsLastMonth] = await db
+    .select({ count: count() })
+    .from(trips)
+    .where(sql`${trips.createdAt} >= ${lastMonth} AND ${trips.createdAt} < ${currentMonth}`);
+
+  const [bookingsLastMonth] = await db
+    .select({ count: count() })
+    .from(bookings)
+    .where(sql`${bookings.createdAt} >= ${lastMonth} AND ${bookings.createdAt} < ${currentMonth}`);
+
   return {
     totalUsers: totalUsers.count,
     totalTrips: totalTrips.count,
@@ -185,6 +228,9 @@ export async function getDashboardStats() {
     usersThisMonth: usersThisMonth.count,
     tripsThisMonth: tripsThisMonth.count,
     bookingsThisMonth: bookingsThisMonth.count,
+    usersLastMonth: usersLastMonth.count,
+    tripsLastMonth: tripsLastMonth.count,
+    bookingsLastMonth: bookingsLastMonth.count,
   };
 }
 
@@ -204,4 +250,50 @@ export async function getRecentBookings(limit = 10) {
     .innerJoin(users, eq(bookings.userId, users.id))
     .orderBy(desc(bookings.createdAt))
     .limit(limit);
+}
+
+// ===== CHART DATA =====
+
+export async function getMonthlyGrowthData() {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const currentYear = new Date().getFullYear();
+  const data: { name: string; users: number; trips: number }[] = [];
+
+  for (let i = 0; i < 12; i++) {
+    const start = new Date(currentYear, i, 1);
+    const end = new Date(currentYear, i + 1, 0, 23, 59, 59);
+
+    const [userCount] = await db
+      .select({ count: count() })
+      .from(users)
+      .where(sql`${users.joinedAt} >= ${start} AND ${users.joinedAt} <= ${end}`);
+
+    const [tripCount] = await db
+      .select({ count: count() })
+      .from(trips)
+      .where(sql`${trips.createdAt} >= ${start} AND ${trips.createdAt} <= ${end}`);
+
+    data.push({
+      name: months[i],
+      users: userCount.count,
+      trips: tripCount.count,
+    });
+  }
+
+  return data;
+}
+
+export async function getTripDistributionByGroupType() {
+  const result = await db
+    .select({
+      name: trips.groupType,
+      count: count(),
+    })
+    .from(trips)
+    .groupBy(trips.groupType);
+
+  return result.map((r) => ({
+    name: r.name || "Unknown",
+    count: r.count,
+  }));
 }

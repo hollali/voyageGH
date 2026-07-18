@@ -514,21 +514,29 @@ const SAMPLE_TRIPS = [
 ];
 
 async function seed() {
-  console.log("Seeding database with sample Ghana trips...");
+  const dryRun = process.argv.includes("--dry-run");
+  console.log(dryRun ? "[DRY RUN] Would seed database with sample Ghana trips..." : "Seeding database with sample Ghana trips...");
 
   try {
-    // Clear existing trips
-    await db.delete(trips);
-    console.log("Cleared existing trips.");
+    if (!dryRun) {
+      // Clear existing trips
+      await db.delete(trips);
+      console.log("Cleared existing trips.");
 
-    // Insert sample trips
-    const result = await db.insert(trips).values(SAMPLE_TRIPS).returning();
-    console.log(`Inserted ${result.length} trips successfully.`);
+      // Insert sample trips
+      const result = await db.insert(trips).values(SAMPLE_TRIPS).returning();
+      console.log(`Inserted ${result.length} trips successfully.`);
 
-    // Log the IDs
-    result.forEach((trip) => {
-      console.log(`  - [${trip.id}] ${trip.name}`);
-    });
+      // Log the IDs
+      result.forEach((trip) => {
+        console.log(`  - [${trip.id}] ${trip.name}`);
+      });
+    } else {
+      console.log(`Would insert ${SAMPLE_TRIPS.length} trips:`);
+      SAMPLE_TRIPS.forEach((trip) => {
+        console.log(`  - ${trip.name} (${trip.duration} days, ${trip.estimatedPrice})`);
+      });
+    }
 
     console.log("Seeding complete!");
   } catch (error) {

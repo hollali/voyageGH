@@ -11,18 +11,22 @@ import {
   Legend,
 } from "recharts";
 
-const data = [
-  { name: "Solo", count: 35 },
-  { name: "Couple", count: 28 },
-  { name: "Family", count: 22 },
-  { name: "Friends", count: 18 },
-  { name: "Business", count: 12 },
+interface TripDistributionChartProps {
+  data?: { name: string; count: number }[];
+}
+
+const fallbackData = [
+  { name: "Solo", count: 0 },
+  { name: "Couple", count: 0 },
+  { name: "Family", count: 0 },
+  { name: "Friends", count: 0 },
+  { name: "Business", count: 0 },
 ];
 
-export function TripDistributionChart() {
+export function TripDistributionChart({ data }: TripDistributionChartProps) {
   return (
     <ResponsiveContainer width="100%" height={300}>
-      <BarChart data={data}>
+      <BarChart data={data || fallbackData}>
         <CartesianGrid strokeDasharray="3 3" stroke="#eaecf0" />
         <XAxis
           dataKey="name"

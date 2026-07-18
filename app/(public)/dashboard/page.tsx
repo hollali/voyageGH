@@ -5,6 +5,7 @@ import { Header } from "~/components/Header";
 import { Footer } from "~/components/Footer";
 import { getBookingsByUser } from "~/lib/actions";
 import Image from "next/image";
+import { CancelBookingButton } from "~/components/CancelBookingButton";
 
 export const metadata = {
   title: "My Dashboard | VoyageGH",
@@ -39,12 +40,12 @@ export default async function UserDashboardPage() {
               <p className="text-sm text-gray-100">Explore AI-generated itineraries across Ghana</p>
             </Link>
             <Link
-              href="/admin/create-trip"
+              href="/trips"
               className="bg-white p-6 rounded-20 shadow-400 hover:shadow-500 transition-shadow flex flex-col gap-3"
             >
               <Image src="/assets/icons/magic-star.svg" alt="create" width={32} height={32} />
-              <h3 className="p-18-semibold text-dark-100">Create Trip</h3>
-              <p className="text-sm text-gray-100">Generate a custom AI itinerary for your Ghana adventure</p>
+              <h3 className="p-18-semibold text-dark-100">Find a Trip</h3>
+              <p className="text-sm text-gray-100">Discover AI-generated itineraries for your Ghana adventure</p>
             </Link>
             <div className="bg-white p-6 rounded-20 shadow-400 flex flex-col gap-3">
               <Image src="/assets/icons/booking.svg" alt="bookings" width={32} height={32} />
@@ -77,6 +78,7 @@ export default async function UserDashboardPage() {
                     <th className="text-left p-4 text-sm font-semibold text-dark-200">Price</th>
                     <th className="text-left p-4 text-sm font-semibold text-dark-200">Status</th>
                     <th className="text-left p-4 text-sm font-semibold text-dark-200">Date</th>
+                    <th className="text-left p-4 text-sm font-semibold text-dark-200">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -94,6 +96,11 @@ export default async function UserDashboardPage() {
                           month: "short",
                           year: "numeric",
                         })}
+                      </td>
+                      <td className="p-4">
+                        {booking.status === "pending" && (
+                          <CancelBookingButton bookingId={booking.id} />
+                        )}
                       </td>
                     </tr>
                   ))}

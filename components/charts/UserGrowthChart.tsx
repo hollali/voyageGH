@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   LineChart,
   Line,
@@ -11,20 +12,24 @@ import {
   Legend,
 } from "recharts";
 
-const data = [
-  { name: "Jan", users: 40, trips: 24 },
-  { name: "Feb", users: 30, trips: 13 },
-  { name: "Mar", users: 20, trips: 98 },
-  { name: "Apr", users: 27, trips: 39 },
-  { name: "May", users: 18, trips: 48 },
-  { name: "Jun", users: 23, trips: 38 },
-  { name: "Jul", users: 34, trips: 43 },
+interface UserGrowthChartProps {
+  data?: { name: string; users: number; trips: number }[];
+}
+
+const fallbackData = [
+  { name: "Jan", users: 0, trips: 0 },
+  { name: "Feb", users: 0, trips: 0 },
+  { name: "Mar", users: 0, trips: 0 },
+  { name: "Apr", users: 0, trips: 0 },
+  { name: "May", users: 0, trips: 0 },
+  { name: "Jun", users: 0, trips: 0 },
+  { name: "Jul", users: 0, trips: 0 },
 ];
 
-export function UserGrowthChart() {
+export function UserGrowthChart({ data }: UserGrowthChartProps) {
   return (
     <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={data}>
+      <LineChart data={data || fallbackData}>
         <CartesianGrid strokeDasharray="3 3" stroke="#eaecf0" />
         <XAxis
           dataKey="name"

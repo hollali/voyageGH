@@ -2,8 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getGeminiApiKey } from "~/lib/env";
 import { createTrip } from "~/lib/actions";
+import { checkRateLimit, getRateLimitHeaders } from "~/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
+  const rateKey = `ai-trip`;
+  const rateLimit = checkRateLimit(rateKey, 5, 60000);
+  const headers = getRateLimitHeaders(rateKey, 5);
+
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: `Rate limit exceeded. Try again in ${rateLimit.retryAfter}s` },
+      { status: 429, headers }
+    );
+  }
+
   try {
     const body = await request.json();
     const { country, travelStyle, interest, budget, duration, groupType } = body;
@@ -93,7 +105,18 @@ export async function POST(request: NextRequest) {
 
     const tripData = JSON.parse(jsonMatch[0]);
 
-    // Save to database
+    const ghanaImages = [
+      "/assets/images/ghana/accra-city.jpg",
+      "/assets/images/ghana/cape-coast-castle.jpg",
+      "/assets/images/ghana/kumasi.jpg",
+      "/assets/images/ghana/volta-region.jpg",
+      "/assets/images/ghana/kakum-canopy.jpg",
+      "/assets/images/ghana/mole-national-park.jpg",
+      "/assets/images/ghana/bonwire-kente.jpg",
+      "/assets/images/ghana/jamestown-lighthouse.jpg",
+    ];
+    const randomImages = ghanaImages.sort(() => Math.random() - 0.5).slice(0, 3);
+
     const savedTrip = await createTrip({
       name: tripData.name,
       description: tripData.description,
@@ -104,7 +127,7 @@ export async function POST(request: NextRequest) {
       interests: tripData.interests,
       groupType: tripData.groupType,
       country: tripData.country,
-      imageUrls: tripData.imageUrls || [],
+      imageUrls: randomImages,
       itinerary: tripData.itinerary,
       bestTimeToVisit: tripData.bestTimeToVisit,
       weatherInfo: tripData.weatherInfo,
