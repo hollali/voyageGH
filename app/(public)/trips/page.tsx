@@ -137,7 +137,7 @@ export default function TripsPage() {
                   id={trip.id}
                   name={trip.name}
                   location={trip.country || ""}
-                  imageUrl={trip.imageUrls?.[0] || "/assets/images/sample1.jpg"}
+                  imageUrl={trip.imageUrls?.[0] || "/assets/images/ghana/accra-city.jpg"}
                   tags={[trip.travelStyle, trip.budget].filter((t): t is string => Boolean(t))}
                   price={trip.estimatedPrice || ""}
                 />

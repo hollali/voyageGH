@@ -20,7 +20,7 @@ const SAMPLE_TRIPS = [
     interests: "Food & Local Cuisine, Music & Nightlife, Markets & Shopping",
     groupType: "Solo",
     country: "Greater Accra",
-    imageUrls: ["/assets/images/sample1.svg"],
+    imageUrls: ["/assets/images/ghana/accra-city.jpg", "/assets/images/ghana/jamestown-lighthouse.jpg", "/assets/images/ghana/makola-market.jpg", "/assets/images/ghana/labadi-beach.jpg"],
     itinerary: [
       {
         day: 1,
@@ -84,7 +84,7 @@ const SAMPLE_TRIPS = [
     interests: "Historical Sites & Castles, Nature & Wildlife, Hiking & Waterfalls",
     groupType: "Family",
     country: "Central",
-    imageUrls: ["/assets/images/sample2.svg"],
+    imageUrls: ["/assets/images/ghana/cape-coast-castle.jpg", "/assets/images/ghana/elmina-castle.jpg", "/assets/images/ghana/kakum-canopy.jpg"],
     itinerary: [
       {
         day: 1,
@@ -157,7 +157,7 @@ const SAMPLE_TRIPS = [
     interests: "Kente & Craft Villages, Markets & Shopping, Festivals & Cultural Events",
     groupType: "Couple",
     country: "Ashanti",
-    imageUrls: ["/assets/images/sample3.svg"],
+    imageUrls: ["/assets/images/ghana/kumasi.jpg", "/assets/images/ghana/kejetia-market.jpg", "/assets/images/ghana/bonwire-kente.jpg", "/assets/images/ghana/kente-cloth.jpg"],
     itinerary: [
       {
         day: 1,
@@ -239,7 +239,7 @@ const SAMPLE_TRIPS = [
     interests: "Hiking & Waterfalls, Nature & Wildlife, Photography Spots",
     groupType: "Friends",
     country: "Volta",
-    imageUrls: ["/assets/images/sample4.svg"],
+    imageUrls: ["/assets/images/ghana/volta-region.jpg", "/assets/images/ghana/wli-waterfalls.jpg", "/assets/images/ghana/lake-bosomtwe.jpg"],
     itinerary: [
       {
         day: 1,
@@ -330,7 +330,7 @@ const SAMPLE_TRIPS = [
     interests: "Nature & Wildlife, Photography Spots, Hiking & Waterfalls",
     groupType: "Couple",
     country: "Northern",
-    imageUrls: ["/assets/images/sample5.svg"],
+    imageUrls: ["/assets/images/ghana/mole-national-park.jpg", "/assets/images/ghana/ghana-adventure.jpg", "/assets/images/ghana/cocoa-farm.jpg"],
     itinerary: [
       {
         day: 1,
@@ -403,7 +403,7 @@ const SAMPLE_TRIPS = [
     interests: "Historical Sites & Castles, Festivals & Cultural Events, Food & Local Cuisine",
     groupType: "Diaspora Visit",
     country: "Ghana",
-    imageUrls: ["/assets/images/sample6.svg"],
+    imageUrls: ["/assets/images/ghana/accra-skyline.jpg", "/assets/images/ghana/kwame-nkrumah-memorial.jpg", "/assets/images/ghana/ghana-flag.jpg", "/assets/images/ghana/african-art.jpg"],
     itinerary: [
       {
         day: 1,

@@ -72,21 +72,86 @@ export default function HomePage() {
             <p className="text-gray-100 text-lg">Explore the diverse regions of Ghana</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white p-8 rounded-20 shadow-300 flex flex-col gap-4">
-              <Image src="/assets/icons/destination.svg" alt="accra" width={32} height={32} />
-              <h3 className="p-18-bold text-dark-100">Greater Accra</h3>
-              <p className="text-gray-100 text-sm">Vibrant capital city with nightlife, markets, and Independence Square</p>
-            </div>
-            <div className="bg-white p-8 rounded-20 shadow-300 flex flex-col gap-4">
-              <Image src="/assets/icons/destination.svg" alt="cape-coast" width={32} height={32} />
-              <h3 className="p-18-bold text-dark-100">Cape Coast & Central</h3>
-              <p className="text-gray-100 text-sm">Historic castles, Kakum canopy walk, and beautiful beaches</p>
-            </div>
-            <div className="bg-white p-8 rounded-20 shadow-300 flex flex-col gap-4">
-              <Image src="/assets/icons/destination.svg" alt="ashanti" width={32} height={32} />
-              <h3 className="p-18-bold text-dark-100">Ashanti Region</h3>
-              <p className="text-gray-100 text-sm">Kumasi city, Manhyia Palace, Kejetia Market, and craft villages</p>
-            </div>
+            <Link href="/trips" className="group relative rounded-20 overflow-hidden h-[280px]">
+              <Image
+                src="/assets/images/ghana/accra-city.jpg"
+                alt="Greater Accra"
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+              <div className="absolute bottom-0 left-0 p-6">
+                <h3 className="p-18-bold text-white">Greater Accra</h3>
+                <p className="text-white/80 text-sm mt-1">Vibrant capital with nightlife, markets, and history</p>
+              </div>
+            </Link>
+            <Link href="/trips" className="group relative rounded-20 overflow-hidden h-[280px]">
+              <Image
+                src="/assets/images/ghana/cape-coast-castle.jpg"
+                alt="Cape Coast"
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+              <div className="absolute bottom-0 left-0 p-6">
+                <h3 className="p-18-bold text-white">Cape Coast & Central</h3>
+                <p className="text-white/80 text-sm mt-1">Historic castles, Kakum canopy, and beaches</p>
+              </div>
+            </Link>
+            <Link href="/trips" className="group relative rounded-20 overflow-hidden h-[280px]">
+              <Image
+                src="/assets/images/ghana/kumasi.jpg"
+                alt="Ashanti Region"
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+              <div className="absolute bottom-0 left-0 p-6">
+                <h3 className="p-18-bold text-white">Ashanti Region</h3>
+                <p className="text-white/80 text-sm mt-1">Kumasi, Manhyia Palace, and craft villages</p>
+              </div>
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Link href="/trips" className="group relative rounded-20 overflow-hidden h-[280px]">
+              <Image
+                src="/assets/images/ghana/volta-region.jpg"
+                alt="Volta Region"
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+              <div className="absolute bottom-0 left-0 p-6">
+                <h3 className="p-18-bold text-white">Volta Region</h3>
+                <p className="text-white/80 text-sm mt-1">Waterfalls, lagoons, and mountain trails</p>
+              </div>
+            </Link>
+            <Link href="/trips" className="group relative rounded-20 overflow-hidden h-[280px]">
+              <Image
+                src="/assets/images/ghana/mole-national-park.jpg"
+                alt="Northern Ghana"
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+              <div className="absolute bottom-0 left-0 p-6">
+                <h3 className="p-18-bold text-white">Northern Ghana</h3>
+                <p className="text-white/80 text-sm mt-1">Safari, savannah, and ancient mosques</p>
+              </div>
+            </Link>
+            <Link href="/trips" className="group relative rounded-20 overflow-hidden h-[280px]">
+              <Image
+                src="/assets/images/ghana/kente-cloth.jpg"
+                alt="Culture & Heritage"
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+              <div className="absolute bottom-0 left-0 p-6">
+                <h3 className="p-18-bold text-white">Culture & Heritage</h3>
+                <p className="text-white/80 text-sm mt-1">Kente weaving, Adinkra symbols, and festivals</p>
+              </div>
+            </Link>
           </div>
         </div>
       </section>
