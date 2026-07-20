@@ -1,5 +1,17 @@
 const rateLimits = new Map<string, { count: number; resetTime: number }>();
 
+// Clean up expired entries every 5 minutes
+if (typeof setInterval !== "undefined") {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, record] of rateLimits.entries()) {
+      if (now > record.resetTime) {
+        rateLimits.delete(key);
+      }
+    }
+  }, 5 * 60 * 1000);
+}
+
 export function checkRateLimit(
   key: string,
   maxRequests = 30,

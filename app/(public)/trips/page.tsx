@@ -1,12 +1,22 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { motion } from "framer-motion";
+import { Search, X } from "lucide-react";
 import { Header } from "~/components/Header";
 import { Footer } from "~/components/Footer";
 import { TripCard } from "~/components/TripCard";
 import { ghanaRegions, travelStyles, budgetOptions, DUMMY_TRIPS } from "~/lib/constants";
+
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  return debouncedValue;
+}
 
 interface TripListItem {
   id: number;
@@ -30,12 +40,13 @@ export default function TripsPage() {
   const [selectedRegion, setSelectedRegion] = useState("");
   const [selectedStyle, setSelectedStyle] = useState("");
   const [selectedBudget, setSelectedBudget] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 300);
 
   const fetchTrips = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (searchQuery) params.set("query", searchQuery);
+      if (debouncedSearch) params.set("query", debouncedSearch);
       if (selectedRegion) params.set("region", selectedRegion);
       if (selectedStyle) params.set("travelStyle", selectedStyle);
       if (selectedBudget) params.set("budget", selectedBudget);
@@ -48,7 +59,7 @@ export default function TripsPage() {
     } finally {
       setLoading(false);
     }
-  }, [searchQuery, selectedRegion, selectedStyle, selectedBudget]);
+  }, [debouncedSearch, selectedRegion, selectedStyle, selectedBudget]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -69,7 +80,7 @@ export default function TripsPage() {
           {/* Search & Filters */}
           <div className="flex flex-col gap-4">
             <div className="relative">
-              <Image src="/assets/icons/search.svg" alt="search" width={20} height={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-100" />
+              <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-100" />
               <input
                 type="text"
                 placeholder="Search trips by name or description..."
@@ -77,6 +88,16 @@ export default function TripsPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-3.5 border border-light-400 rounded-xl text-base text-dark-300 focus:outline-none focus:border-primary-100"
               />
+              {searchQuery && (
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-100 hover:text-dark-100"
+                >
+                  <X size={16} />
+                </motion.button>
+              )}
             </div>
             <div className="flex flex-wrap gap-4">
               <select
@@ -145,7 +166,7 @@ export default function TripsPage() {
               </button>
             </div>
           ) : (
-            <div className="trip-grid">
+            <div className="trip-grid stagger-children">
               {trips.map((trip) => (
                 <TripCard
                   key={trip.id}

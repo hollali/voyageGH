@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getGeminiApiKey } from "~/lib/env";
 import { createTrip } from "~/lib/actions";
 import { checkRateLimit, getRateLimitHeaders } from "~/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
-  const rateKey = `ai-trip`;
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const rateKey = `ai-trip:${userId}`;
   const rateLimit = checkRateLimit(rateKey, 5, 60000);
   const headers = getRateLimitHeaders(rateKey, 5);
 
@@ -137,10 +143,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(savedTrip);
   } catch (error) {
     console.error("AI trip generation error:", error);
-    const message =
-      error instanceof Error && error.message.includes("GEMINI_API_KEY")
-        ? "AI trip generation is not configured. Set GEMINI_API_KEY in .env.local"
-        : "Failed to generate trip";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to generate trip" },
+      { status: 500 }
+    );
   }
 }

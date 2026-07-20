@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { CancelBookingButton } from "~/components/CancelBookingButton";
 
 interface BookingEntry {
@@ -32,9 +33,13 @@ function StatusBadge({ status }: { status: string }) {
   };
 
   return (
-    <span className={`px-3 py-1 text-xs rounded-full font-medium ${colors[status] || "bg-light-500 text-gray-100"}`}>
+    <motion.span
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className={`px-3 py-1 text-xs rounded-full font-medium ${colors[status] || "bg-light-500 text-gray-100"}`}
+    >
       {status}
-    </span>
+    </motion.span>
   );
 }
 
@@ -55,6 +60,7 @@ export function UserBookingsTable({ bookings }: UserBookingsTableProps) {
           </Link>
         </div>
       ) : (
+        <div className="table-responsive">
         <table className="w-full">
           <thead>
             <tr className="border-b border-light-400">
@@ -67,8 +73,14 @@ export function UserBookingsTable({ bookings }: UserBookingsTableProps) {
             </tr>
           </thead>
           <tbody>
-            {bookings.map(({ booking, trip }) => (
-              <tr key={booking.id} className="border-b border-light-400 hover:bg-light-200 transition-colors">
+            {bookings.map(({ booking, trip }, index) => (
+              <motion.tr
+                key={booking.id}
+                className="border-b border-light-400 hover:bg-light-200 transition-colors"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+              >
                 <td className="p-4 text-sm font-medium text-dark-100">{trip.name}</td>
                 <td className="p-4 text-sm text-gray-100">{trip.country}</td>
                 <td className="p-4 text-sm text-gray-100">{trip.estimatedPrice}</td>
@@ -87,10 +99,11 @@ export function UserBookingsTable({ bookings }: UserBookingsTableProps) {
                     <CancelBookingButton bookingId={booking.id} />
                   )}
                 </td>
-              </tr>
+              </motion.tr>
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

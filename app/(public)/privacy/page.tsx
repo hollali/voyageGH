@@ -21,7 +21,7 @@ export default function PrivacyPage() {
             <h2 className="text-xl font-semibold text-dark-100">3. Data Security</h2>
             <p>We implement industry-standard security measures to protect your personal data. However, no method of transmission over the Internet is 100% secure.</p>
             <h2 className="text-xl font-semibold text-dark-100">4. Third-Party Services</h2>
-            <p>We use third-party services (Clerk for authentication, Stripe for payments) that may collect information. Their privacy policies govern their use of your data.</p>
+            <p>We use third-party services (Clerk for authentication, Paystack for payments) that may collect information. Their privacy policies govern their use of your data.</p>
             <h2 className="text-xl font-semibold text-dark-100">5. Cookies</h2>
             <p>We use essential cookies to maintain your session and improve your experience. You can control cookie settings through your browser preferences.</p>
             <h2 className="text-xl font-semibold text-dark-100">6. Your Rights</h2>

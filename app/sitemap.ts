@@ -1,7 +1,17 @@
 import { MetadataRoute } from "next";
+import { db } from "~/lib/db";
+import { trips } from "~/lib/db/schema";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://voyagegh.netlify.app";
+
+  const allTrips = await db.select({ id: trips.id }).from(trips);
+  const tripEntries = allTrips.map((trip) => ({
+    url: `${baseUrl}/trips/${trip.id}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }));
 
   return [
     {
@@ -16,6 +26,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily",
       priority: 0.9,
     },
+    ...tripEntries,
     {
       url: `${baseUrl}/terms`,
       lastModified: new Date(),

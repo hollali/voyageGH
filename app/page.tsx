@@ -1,9 +1,11 @@
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
+import { Map, Users, Navigation, Sparkles } from "lucide-react";
 import { Header } from "~/components/Header";
 import { Footer } from "~/components/Footer";
 import { TripCard } from "~/components/TripCard";
 import { DUMMY_TRIPS } from "~/lib/constants";
+import { FadeIn, HoverLift, IconHover } from "~/components/MotionWrappers";
 
 export default function HomePage() {
   return (
@@ -15,27 +17,35 @@ export default function HomePage() {
         <div>
           <section className="wrapper">
             <article className="flex flex-col w-full md:max-w-[520px] gap-3.5">
-              <h1 className="p-72-bold text-dark-100">
-                Explore the Heart of Ghana
-              </h1>
-              <p className="text-lg font-normal text-dark-400">
-                From the vibrant streets of Accra to the serene shores of Cape Coast. 
-                AI-powered itineraries tailored to your Ghanaian adventure.
-              </p>
-              <div className="flex gap-4 mt-2">
-                <Link
-                  href="/trips"
-                  className="px-6 py-3 bg-primary-100 text-white rounded-lg font-semibold hover:bg-primary-500 transition-colors"
-                >
-                  Explore Trips
-                </Link>
-                <Link
-                  href="/admin/create-trip"
-                  className="px-6 py-3 border border-primary-100 text-primary-100 rounded-lg font-semibold hover:bg-primary-50 transition-colors"
-                >
-                  Create with AI
-                </Link>
-              </div>
+              <FadeIn>
+                <h1 className="p-72-bold text-dark-100">
+                  Explore the Heart of Ghana
+                </h1>
+              </FadeIn>
+              <FadeIn delay={0.15}>
+                <p className="text-lg font-normal text-dark-400">
+                  From the vibrant streets of Accra to the serene shores of Cape Coast. 
+                  AI-powered itineraries tailored to your Ghanaian adventure.
+                </p>
+              </FadeIn>
+              <FadeIn delay={0.3}>
+                <div className="flex gap-4 mt-2">
+                  <Link
+                    href="/trips"
+                    className="px-6 py-3 bg-primary-100 text-white rounded-lg font-semibold hover:bg-primary-500 transition-colors flex items-center gap-2"
+                  >
+                    <Navigation size={18} />
+                    Explore Trips
+                  </Link>
+                  <Link
+                    href="/admin/create-trip"
+                    className="px-6 py-3 border border-primary-100 text-primary-100 rounded-lg font-semibold hover:bg-primary-50 transition-colors flex items-center gap-2"
+                  >
+                    <Sparkles size={18} />
+                    Create with AI
+                  </Link>
+                </div>
+              </FadeIn>
             </article>
           </section>
         </div>
@@ -48,7 +58,7 @@ export default function HomePage() {
             <h2 className="p-30-bold text-dark-100">Popular Ghana Trips</h2>
             <p className="text-gray-100 text-lg">Discover handcrafted itineraries across Ghana</p>
           </div>
-          <div className="trip-grid">
+          <div className="trip-grid stagger-children">
             {DUMMY_TRIPS.map((trip) => (
               <TripCard
                 key={trip.id}
@@ -71,7 +81,7 @@ export default function HomePage() {
             <h2 className="p-30-bold text-dark-100">Top Ghana Destinations</h2>
             <p className="text-gray-100 text-lg">Explore the diverse regions of Ghana</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 stagger-children">
             <Link href="/trips" className="group relative rounded-20 overflow-hidden h-[280px]">
               <Image
                 src="/assets/images/ghana/accra-city.jpg"
@@ -112,7 +122,7 @@ export default function HomePage() {
               </div>
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 stagger-children">
             <Link href="/trips" className="group relative rounded-20 overflow-hidden h-[280px]">
               <Image
                 src="/assets/images/ghana/volta-region.jpg"
@@ -158,22 +168,28 @@ export default function HomePage() {
 
       {/* Stats Section */}
       <section className="wrapper pb-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-8 rounded-20 shadow-300 flex flex-col gap-4">
-            <Image src="/assets/icons/itinerary.svg" alt="trips" width={32} height={32} />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 stagger-children">
+          <HoverLift className="bg-white p-8 rounded-20 shadow-300 flex flex-col gap-4">
+            <IconHover>
+              <Map size={32} className="text-primary-100" />
+            </IconHover>
             <h3 className="p-30-bold text-dark-100">16</h3>
             <p className="text-gray-100">Regions Covered</p>
-          </div>
-          <div className="bg-white p-8 rounded-20 shadow-300 flex flex-col gap-4">
-            <Image src="/assets/icons/users.svg" alt="users" width={32} height={32} />
+          </HoverLift>
+          <HoverLift className="bg-white p-8 rounded-20 shadow-300 flex flex-col gap-4">
+            <IconHover>
+              <Users size={32} className="text-primary-100" />
+            </IconHover>
             <h3 className="p-30-bold text-dark-100">50+</h3>
             <p className="text-gray-100">Unique Experiences</p>
-          </div>
-          <div className="bg-white p-8 rounded-20 shadow-300 flex flex-col gap-4">
-            <Image src="/assets/icons/destination.svg" alt="destinations" width={32} height={32} />
+          </HoverLift>
+          <HoverLift className="bg-white p-8 rounded-20 shadow-300 flex flex-col gap-4">
+            <IconHover>
+              <Navigation size={32} className="text-primary-100" />
+            </IconHover>
             <h3 className="p-30-bold text-dark-100">100%</h3>
             <p className="text-gray-100">Made in Ghana</p>
-          </div>
+          </HoverLift>
         </div>
       </section>
 

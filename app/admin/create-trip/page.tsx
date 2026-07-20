@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { Loader2, Sparkles, Map } from "lucide-react";
 import { Sidebar, MobileSidebar } from "~/components/Sidebar";
 import { ghanaRegions, travelStyles, interests, budgetOptions, groupTypes } from "~/lib/constants";
 import type { TripFormData } from "~/lib/types";
@@ -161,23 +162,30 @@ export default function CreateTripPage() {
                 </div>
 
                 <div className="px-6">
-                  <button
+                  <motion.button
                     type="submit"
                     disabled={loading}
                     className="w-full py-3 bg-primary-100 text-white rounded-lg font-semibold hover:bg-primary-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
                   >
                     {loading ? (
                       <>
-                        <Image src="/assets/icons/loader.svg" alt="loading" width={20} height={20} className="animate-spin" />
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        >
+                          <Loader2 size={20} />
+                        </motion.div>
                         Generating...
                       </>
                     ) : (
                       <>
-                        <Image src="/assets/icons/magic-star.svg" alt="ai" width={20} height={20} />
+                        <Sparkles size={20} />
                         Generate Trip
                       </>
                     )}
-                  </button>
+                  </motion.button>
                 </div>
               </form>
 
@@ -232,7 +240,7 @@ export default function CreateTripPage() {
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-[400px] text-gray-100">
-                    <Image src="/assets/icons/itinerary.svg" alt="preview" width={48} height={48} className="mb-4 opacity-50" />
+                    <Map size={48} className="mb-4 opacity-50" />
                     <p>Generated itinerary will appear here</p>
                   </div>
                 )}

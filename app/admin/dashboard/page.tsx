@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { BarChart3 } from "lucide-react";
 import { Sidebar, MobileSidebar } from "~/components/Sidebar";
 import { StatsCard } from "~/components/StatsCard";
 import { UserGrowthChart } from "~/components/charts/UserGrowthChart";
@@ -67,7 +68,10 @@ export default async function AdminDashboardPage() {
 
             {/* Charts */}
             <div className="container">
-              <h1 className="text-xl font-semibold text-dark-100">Analytics</h1>
+              <div className="flex items-center gap-2">
+                <BarChart3 size={20} className="text-primary-100" />
+                <h1 className="text-xl font-semibold text-dark-100">Analytics</h1>
+              </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="bg-white p-6 rounded-20 shadow-400">
                   <h2 className="p-18-semibold text-dark-100 mb-4">User Growth</h2>
@@ -84,6 +88,7 @@ export default async function AdminDashboardPage() {
             <div className="container">
               <h1 className="text-xl font-semibold text-dark-100">Recent Trips</h1>
               <div className="bg-white rounded-20 shadow-400 overflow-hidden">
+                <div className="table-responsive">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-light-400">
@@ -112,6 +117,7 @@ export default async function AdminDashboardPage() {
                     )}
                   </tbody>
                 </table>
+                </div>
               </div>
             </div>
           </div>

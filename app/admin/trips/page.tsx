@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { Eye, Sparkles } from "lucide-react";
 import { Sidebar, MobileSidebar } from "~/components/Sidebar";
 import { getAllTrips, requireAdmin } from "~/lib/actions";
 import { DeleteTripButton } from "~/components/DeleteTripButton";
@@ -34,6 +35,7 @@ export default async function AdminTripsPage() {
 
             {allTrips.length === 0 ? (
               <div className="bg-white rounded-20 shadow-400 p-12 text-center">
+                <Sparkles size={48} className="mx-auto mb-4 text-primary-100 opacity-50" />
                 <p className="text-gray-100 text-lg">No trips generated yet.</p>
                 <a
                   href="/admin/create-trip"
@@ -44,6 +46,7 @@ export default async function AdminTripsPage() {
               </div>
             ) : (
               <div className="bg-white rounded-20 shadow-400 overflow-hidden">
+                <div className="table-responsive">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-light-400">
@@ -86,7 +89,7 @@ export default async function AdminTripsPage() {
                               className="p-2 rounded-lg hover:bg-light-200 transition-colors"
                               title="View trip"
                             >
-                              <Image src="/assets/icons/itinerary.svg" alt="view" width={16} height={16} />
+                              <Eye size={16} className="text-gray-100" />
                             </Link>
                             <DeleteTripButton tripId={trip.id} tripName={trip.name} />
                           </div>
@@ -95,6 +98,7 @@ export default async function AdminTripsPage() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
             )}
           </div>

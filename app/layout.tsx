@@ -6,19 +6,21 @@ import "./globals.css";
 
 validateEnv();
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://voyagegh.netlify.app";
+
 export const metadata: Metadata = {
   title: "VoyageGH - AI-Powered Travel Agency for Ghana",
   description: "Generate personalized AI-powered trip itineraries and book your dream vacation in Ghana.",
   openGraph: {
     title: "VoyageGH - AI-Powered Travel Agency for Ghana",
     description: "Generate personalized AI-powered trip itineraries and book your dream vacation in Ghana.",
-    url: "https://voyagegh.netlify.app",
+    url: baseUrl,
     siteName: "VoyageGH",
     type: "website",
     locale: "en_US",
     images: [
       {
-        url: "/assets/images/ghana/accra-city.jpg",
+        url: `${baseUrl}/assets/images/ghana/accra-city.jpg`,
         width: 1200,
         height: 630,
         alt: "VoyageGH - AI Travel Agency for Ghana",
@@ -29,7 +31,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "VoyageGH - AI-Powered Travel Agency for Ghana",
     description: "Generate personalized AI-powered trip itineraries and book your dream vacation in Ghana.",
-    images: ["/assets/images/ghana/accra-city.jpg"],
+    images: [`${baseUrl}/assets/images/ghana/accra-city.jpg`],
   },
   robots: {
     index: true,

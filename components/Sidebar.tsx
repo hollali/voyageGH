@@ -4,8 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
+import { motion } from "framer-motion";
 import { cn } from "~/lib/utils";
 import { sidebarItems } from "~/lib/constants";
+import { SidebarAnimatedIcon } from "~/components/AnimatedIcon";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -24,17 +26,22 @@ export function Sidebar() {
         <div className="container">
           <div className="flex flex-col gap-3.5 pt-9">
             {sidebarItems.map((item) => (
-              <Link
+              <motion.div
                 key={item.id}
-                href={item.href}
-                className={cn(
-                  "nav-item",
-                  pathname === item.href && "!bg-primary-100 !text-white"
-                )}
+                whileHover={{ x: 4 }}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
               >
-                <Image src={item.icon} alt={item.label} width={20} height={20} />
-                <span>{item.label}</span>
-              </Link>
+                <Link
+                  href={item.href}
+                  className={cn(
+                    "nav-item",
+                    pathname === item.href && "!bg-primary-100 !text-white"
+                  )}
+                >
+                  <SidebarAnimatedIcon name={item.icon} size={20} />
+                  <span>{item.label}</span>
+                </Link>
+              </motion.div>
             ))}
           </div>
           <div className="nav-footer">
@@ -81,7 +88,7 @@ export function MobileSidebar() {
             href={item.href}
             className="nav-item"
           >
-            <Image src={item.icon} alt={item.label} width={20} height={20} />
+            <SidebarAnimatedIcon name={item.icon} size={20} />
             <span>{item.label}</span>
           </Link>
         ))}

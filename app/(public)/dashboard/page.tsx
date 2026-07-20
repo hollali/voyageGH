@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { Search, Compass, BookOpen } from "lucide-react";
 import { Header } from "~/components/Header";
 import { Footer } from "~/components/Footer";
 import { getBookingsByUser } from "~/lib/actions";
@@ -21,6 +22,21 @@ export default async function UserDashboardPage(props: { searchParams?: Promise<
 
   const userBookings = await getBookingsByUser(userId);
 
+  const dashCards = [
+    {
+      href: "/trips",
+      title: "Browse Trips",
+      description: "Explore AI-generated itineraries across Ghana",
+      icon: <Compass size={20} className="text-primary-100" />,
+    },
+    {
+      href: "/trips",
+      title: "Find a Trip",
+      description: "Discover AI-generated itineraries for your Ghana adventure",
+      icon: <Search size={20} className="text-primary-100" />,
+    },
+  ];
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -35,21 +51,19 @@ export default async function UserDashboardPage(props: { searchParams?: Promise<
           {paymentStatus && <PaymentAlert status={paymentStatus} />}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Link
-              href="/trips"
-              className="bg-white p-6 rounded-20 shadow-400 hover:shadow-500 transition-shadow flex flex-col gap-3"
-            >
-              <h3 className="p-18-semibold text-dark-100">Browse Trips</h3>
-              <p className="text-sm text-gray-100">Explore AI-generated itineraries across Ghana</p>
-            </Link>
-            <Link
-              href="/trips"
-              className="bg-white p-6 rounded-20 shadow-400 hover:shadow-500 transition-shadow flex flex-col gap-3"
-            >
-              <h3 className="p-18-semibold text-dark-100">Find a Trip</h3>
-              <p className="text-sm text-gray-100">Discover AI-generated itineraries for your Ghana adventure</p>
-            </Link>
+            {dashCards.map((card) => (
+              <Link
+                key={card.title}
+                href={card.href}
+                className="bg-white p-6 rounded-20 shadow-400 hover:shadow-500 transition-shadow flex flex-col gap-3"
+              >
+                {card.icon}
+                <h3 className="p-18-semibold text-dark-100">{card.title}</h3>
+                <p className="text-sm text-gray-100">{card.description}</p>
+              </Link>
+            ))}
             <div className="bg-white p-6 rounded-20 shadow-400 flex flex-col gap-3">
+              <BookOpen size={20} className="text-primary-100" />
               <h3 className="p-18-semibold text-dark-100">My Bookings</h3>
               <p className="text-sm text-gray-100">{userBookings.length} total bookings</p>
             </div>

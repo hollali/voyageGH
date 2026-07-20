@@ -1,19 +1,19 @@
 export const sidebarItems = [
   {
     id: 1,
-    icon: "/assets/icons/home.svg",
+    icon: "home",
     label: "Dashboard",
     href: "/admin/dashboard",
   },
   {
     id: 3,
-    icon: "/assets/icons/users.svg",
+    icon: "users",
     label: "All Users",
     href: "/admin/users",
   },
   {
     id: 4,
-    icon: "/assets/icons/itinerary.svg",
+    icon: "itinerary",
     label: "AI Trips",
     href: "/admin/trips",
   },
@@ -96,34 +96,6 @@ export const comboBoxItems: Record<string, string[]> = {
   travelStyle: travelStyles,
   interest: interests,
   budget: budgetOptions,
-};
-
-export const chartOneData = [
-  { x: "Jan", y1: 0.5, y2: 1.5, y3: 0.7 },
-  { x: "Feb", y1: 0.8, y2: 1.2, y3: 0.9 },
-  { x: "Mar", y1: 1.2, y2: 1.8, y3: 1.5 },
-  { x: "Apr", y1: 1.5, y2: 2.0, y3: 1.8 },
-  { x: "May", y1: 1.8, y2: 2.5, y3: 2.0 },
-  { x: "Jun", y1: 2.0, y2: 2.8, y3: 2.5 },
-];
-
-export const CONFETTI_SETTINGS = {
-  particleCount: 200,
-  spread: 60,
-  colors: ["#FFD700", "#006B3F", "#CE1126", "#FFFFFF", "#000000"],
-  decay: 0.95,
-};
-
-export const LEFT_CONFETTI = {
-  ...CONFETTI_SETTINGS,
-  angle: 45,
-  origin: { x: 0, y: 1 },
-};
-
-export const RIGHT_CONFETTI = {
-  ...CONFETTI_SETTINGS,
-  angle: 135,
-  origin: { x: 1, y: 1 },
 };
 
 export const DUMMY_TRIPS = [
@@ -214,11 +186,3 @@ export const DUMMY_USERS = [
     status: "admin",
   },
 ];
-
-export const DASHBOARD_STATS = {
-  totalUsers: 247,
-  usersJoined: { currentMonth: 42, lastMonth: 31 },
-  totalTrips: 38,
-  tripsCreated: { currentMonth: 8, lastMonth: 3 },
-  userRole: { total: 5, currentMonth: 2, lastMonth: 1 },
-};

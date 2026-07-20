@@ -90,7 +90,7 @@ Users can browse AI-generated trips, book adventures across all 16 regions of Gh
 | **Authentication** | Clerk |
 | **AI** | Google Gemini |
 | **Charts** | Recharts |
-| **Payments** | Stripe (ready) |
+| **Payments** | Paystack (ready) |
 | **Testing** | Vitest |
 | **Hosting** | Netlify |
 
@@ -171,9 +171,9 @@ CLERK_SECRET_KEY=sk_test_...
 # Google Gemini AI (optional)
 GEMINI_API_KEY=AIza...
 
-# Stripe (optional)
-STRIPE_SECRET_KEY=sk_...
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_...
+# Paystack (optional)
+PAYSTACK_SECRET_KEY=sk_...
+NEXT_PUBLIC_PAYSTACK_PUBLISHABLE_KEY=pk_...
 ```
 
 ### Database Setup

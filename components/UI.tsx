@@ -1,14 +1,15 @@
-import Image from "next/image";
+import { type ReactNode } from "react";
+import { Loader2 } from "lucide-react";
 
 interface InfoPillProps {
   text: string;
-  image: string;
+  icon: ReactNode;
 }
 
-export function InfoPill({ text, image }: InfoPillProps) {
+export function InfoPill({ text, icon }: InfoPillProps) {
   return (
     <figure className="info-pill">
-      <Image src={image} alt={text} width={20} height={20} />
+      {icon}
       <figcaption>{text}</figcaption>
     </figure>
   );
@@ -31,7 +32,7 @@ export function Pill({ text, bgColor = "bg-light-500", textColor = "text-primary
 export function Loader() {
   return (
     <div className="flex-center w-full h-full">
-      <Image src="/assets/icons/loader.svg" alt="loading" width={40} height={40} className="animate-spin" />
+      <Loader2 size={40} className="animate-spin text-primary-100" />
     </div>
   );
 }

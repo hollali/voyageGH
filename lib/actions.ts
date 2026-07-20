@@ -257,30 +257,36 @@ export async function getRecentBookings(limit = 10) {
 export async function getMonthlyGrowthData() {
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const currentYear = new Date().getFullYear();
-  const data: { name: string; users: number; trips: number }[] = [];
+  const yearStart = new Date(currentYear, 0, 1);
+  const yearEnd = new Date(currentYear, 11, 31, 23, 59, 59);
 
-  for (let i = 0; i < 12; i++) {
-    const start = new Date(currentYear, i, 1);
-    const end = new Date(currentYear, i + 1, 0, 23, 59, 59);
-
-    const [userCount] = await db
-      .select({ count: count() })
+  const [userRows, tripRows] = await Promise.all([
+    db
+      .select({
+        month: sql<number>`EXTRACT(MONTH FROM ${users.joinedAt})`.as("month"),
+        count: count(),
+      })
       .from(users)
-      .where(sql`${users.joinedAt} >= ${start} AND ${users.joinedAt} <= ${end}`);
-
-    const [tripCount] = await db
-      .select({ count: count() })
+      .where(sql`${users.joinedAt} >= ${yearStart} AND ${users.joinedAt} <= ${yearEnd}`)
+      .groupBy(sql`EXTRACT(MONTH FROM ${users.joinedAt})`),
+    db
+      .select({
+        month: sql<number>`EXTRACT(MONTH FROM ${trips.createdAt})`.as("month"),
+        count: count(),
+      })
       .from(trips)
-      .where(sql`${trips.createdAt} >= ${start} AND ${trips.createdAt} <= ${end}`);
+      .where(sql`${trips.createdAt} >= ${yearStart} AND ${trips.createdAt} <= ${yearEnd}`)
+      .groupBy(sql`EXTRACT(MONTH FROM ${trips.createdAt})`),
+  ]);
 
-    data.push({
-      name: months[i],
-      users: userCount.count,
-      trips: tripCount.count,
-    });
-  }
+  const userMap = new Map(userRows.map((r) => [Number(r.month), r.count]));
+  const tripMap = new Map(tripRows.map((r) => [Number(r.month), r.count]));
 
-  return data;
+  return months.map((name, i) => ({
+    name,
+    users: userMap.get(i + 1) || 0,
+    trips: tripMap.get(i + 1) || 0,
+  }));
 }
 
 export async function getTripDistributionByGroupType() {

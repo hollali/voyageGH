@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
+import { ChevronLeft, MapPin, Star, Calendar, DollarSign, Users, Compass, Sparkles, Thermometer } from "lucide-react";
 import { Header } from "~/components/Header";
 import { Footer } from "~/components/Footer";
 import { getTripById, getReviewsByTrip, getAverageRating } from "~/lib/actions";
@@ -59,9 +60,32 @@ async function findRating(tripId: number) {
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const trip = await findTrip(Number(id));
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://voyagegh.netlify.app";
+  const imageUrl = trip?.imageUrls?.[0] || `${baseUrl}/assets/images/ghana/accra-city.jpg`;
+  const absoluteImageUrl = imageUrl.startsWith("http") ? imageUrl : `${baseUrl}${imageUrl}`;
+
   return {
     title: trip ? `${trip.name} | VoyageGH` : "Trip Not Found | VoyageGH",
     description: trip?.description || "Ghana trip details",
+    openGraph: {
+      title: trip ? `${trip.name} | VoyageGH` : "Trip Not Found | VoyageGH",
+      description: trip?.description || "Ghana trip details",
+      url: `${baseUrl}/trips/${id}`,
+      images: [
+        {
+          url: absoluteImageUrl,
+          width: 1200,
+          height: 630,
+          alt: trip?.name || "VoyageGH Trip",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: trip ? `${trip.name} | VoyageGH` : "Trip Not Found | VoyageGH",
+      description: trip?.description || "Ghana trip details",
+      images: [absoluteImageUrl],
+    },
   };
 }
 
@@ -83,6 +107,13 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
   const heroImage = galleryImages[0];
   const thumbnailImages = galleryImages.slice(1);
 
+  const quickInfoItems = [
+    { icon: <Calendar size={24} className="text-primary-100" />, label: "Duration", value: `${trip.duration} days` },
+    { icon: <DollarSign size={24} className="text-primary-100" />, label: "Budget", value: trip.budget },
+    { icon: <Users size={24} className="text-primary-100" />, label: "Group", value: trip.groupType },
+    { icon: <Compass size={24} className="text-primary-100" />, label: "Style", value: trip.travelStyle },
+  ];
+
   return (
     <div className="flex flex-col min-h-screen bg-light-200">
       <Header />
@@ -102,18 +133,18 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
             href="/trips"
             className="inline-flex items-center gap-2 text-white/80 text-sm mb-4 hover:text-white transition-colors"
           >
-            <Image src="/assets/icons/arrow-left.svg" alt="back" width={16} height={16} className="brightness-0 invert" />
+            <ChevronLeft size={16} />
             Back to Trips
           </Link>
           <h1 className="text-2xl md:text-4xl font-bold text-white mb-2">{trip.name}</h1>
           <div className="flex items-center gap-4 flex-wrap">
             <span className="flex items-center gap-1.5 text-white/90 text-sm">
-              <Image src="/assets/icons/location-mark.svg" alt="location" width={16} height={16} className="brightness-0 invert" />
+              <MapPin size={16} />
               {"country" in trip ? trip.country || "Ghana" : "Ghana"}
             </span>
             {avgRating && avgRating.totalReviews > 0 && (
               <span className="flex items-center gap-1 text-white/90 text-sm">
-                <Image src="/assets/icons/star.svg" alt="star" width={14} height={14} className="brightness-0 invert" />
+                <Star size={14} className="fill-white text-white" />
                 {Number(avgRating.avgRating).toFixed(1)} ({avgRating.totalReviews} reviews)
               </span>
             )}
@@ -152,15 +183,10 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
 
             {/* Trip Quick Info Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                { icon: "📅", label: "Duration", value: `${trip.duration} days` },
-                { icon: "💰", label: "Budget", value: trip.budget },
-                { icon: "👥", label: "Group", value: trip.groupType },
-                { icon: "🎯", label: "Style", value: trip.travelStyle },
-              ].map((item) => (
-                <div key={item.label} className="bg-white p-4 rounded-20 shadow-300 text-center">
-                  <span className="text-2xl mb-2 block">{item.icon}</span>
-                  <p className="text-xs text-gray-100 mb-1">{item.label}</p>
+              {quickInfoItems.map((item) => (
+                <div key={item.label} className="bg-white p-4 rounded-20 shadow-300 text-center flex flex-col items-center gap-2">
+                  {item.icon}
+                  <p className="text-xs text-gray-100">{item.label}</p>
                   <p className="text-sm font-semibold text-dark-100">{item.value}</p>
                 </div>
               ))}
@@ -228,7 +254,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {trip.weatherInfo.map((info, i) => (
                     <div key={i} className="flex items-start gap-3 p-3 bg-light-200 rounded-xl">
-                      <span className="text-lg mt-0.5">🌡️</span>
+                      <Thermometer size={18} className="text-primary-100 mt-0.5" />
                       <p className="text-sm text-dark-400 leading-relaxed">{info}</p>
                     </div>
                   ))}
@@ -285,13 +311,10 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
                         </div>
                         <div className="flex gap-0.5">
                           {Array.from({ length: 5 }).map((_, i) => (
-                            <Image
+                            <Star
                               key={i}
-                              src="/assets/icons/star.svg"
-                              alt="star"
-                              width={12}
-                              height={12}
-                              className={i < Math.round(review.rating) ? "opacity-100" : "opacity-30"}
+                              size={12}
+                              className={i < Math.round(review.rating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}
                             />
                           ))}
                         </div>
@@ -365,13 +388,15 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
               )}
 
               {/* Create Similar */}
-              <Link
-                href="/admin/create-trip"
-                className="flex items-center justify-center gap-2 px-6 py-3 border border-primary-100 text-primary-100 rounded-xl font-semibold hover:bg-primary-50 transition-colors text-sm"
-              >
-                <Image src="/assets/icons/magic-star.svg" alt="ai" width={18} height={18} />
-                Create Similar Trip with AI
-              </Link>
+              {userId && (
+                <Link
+                  href="/admin/create-trip"
+                  className="flex items-center justify-center gap-2 px-6 py-3 border border-primary-100 text-primary-100 rounded-xl font-semibold hover:bg-primary-50 transition-colors text-sm"
+                >
+                  <Sparkles size={18} />
+                  Create Similar Trip with AI
+                </Link>
+              )}
 
               {/* Help Card */}
               <div className="bg-primary-50 p-5 rounded-20 border border-primary-100/20">

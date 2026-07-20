@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+import { motion } from "framer-motion";
+import { Star, Check } from "lucide-react";
+import { useToast } from "~/components/Toast";
 
 interface ReviewFormProps {
   tripId: number;
@@ -15,6 +17,7 @@ export function ReviewForm({ tripId }: ReviewFormProps) {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +35,7 @@ export function ReviewForm({ tripId }: ReviewFormProps) {
       setComment("");
       router.refresh();
     } catch {
-      console.error("Failed to submit review");
+        toast("Failed to submit review. Please try again.", "error");
     } finally {
       setLoading(false);
     }
@@ -40,10 +43,20 @@ export function ReviewForm({ tripId }: ReviewFormProps) {
 
   if (submitted) {
     return (
-      <div className="bg-success-50 p-6 rounded-20 text-success-700 flex items-center gap-3">
-        <Image src="/assets/icons/check.svg" alt="check" width={20} height={20} />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-success-50 p-6 rounded-20 text-success-700 flex items-center gap-3"
+      >
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 500, damping: 15, delay: 0.1 }}
+        >
+          <Check size={20} />
+        </motion.div>
         <span className="font-medium">Review submitted! Thank you for your feedback.</span>
-      </div>
+      </motion.div>
     );
   }
 
@@ -54,22 +67,25 @@ export function ReviewForm({ tripId }: ReviewFormProps) {
       {/* Star Rating */}
       <div className="flex items-center gap-2">
         <span className="text-sm text-gray-100">Rating:</span>
-        <div className="flex gap-1">
+        <div className="flex gap-1" role="radiogroup" aria-label="Rating">
           {[1, 2, 3, 4, 5].map((star) => (
-            <button
+            <motion.button
               key={star}
               type="button"
               onClick={() => setRating(star)}
-              className="focus:outline-none"
+              role="radio"
+              aria-checked={star === rating}
+              aria-label={`Rate ${star} out of 5`}
+              className="focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-100 rounded"
+              whileHover={{ scale: 1.2, rotate: 10 }}
+              whileTap={{ scale: 0.9 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              <Image
-                src="/assets/icons/star.svg"
-                alt={`${star} stars`}
-                width={24}
-                height={24}
-                className={star <= rating ? "opacity-100" : "opacity-30"}
+              <Star
+                size={24}
+                className={star <= rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}
               />
-            </button>
+            </motion.button>
           ))}
         </div>
       </div>
@@ -83,13 +99,15 @@ export function ReviewForm({ tripId }: ReviewFormProps) {
         className="p-3.5 border border-light-400 rounded-xl text-base text-dark-300 font-normal resize-none focus:outline-none focus:border-primary-100"
       />
 
-      <button
+      <motion.button
         type="submit"
         disabled={loading}
         className="self-start px-6 py-2.5 bg-primary-100 text-white rounded-lg font-semibold hover:bg-primary-500 transition-colors disabled:opacity-50 text-sm"
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
       >
         {loading ? "Submitting..." : "Submit Review"}
-      </button>
+      </motion.button>
     </form>
   );
 }

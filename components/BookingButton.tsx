@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+import { motion } from "framer-motion";
+import { Loader2, Check, CreditCard } from "lucide-react";
 
 interface BookingButtonProps {
   tripId: number;
@@ -53,7 +54,12 @@ export function BookingButton({ tripId, userId, tripName, price }: BookingButton
   if (status === "redirecting") {
     return (
       <div className="px-8 py-3 bg-primary-100/10 text-primary-100 rounded-lg font-semibold flex items-center gap-2">
-        <Image src="/assets/icons/loader.svg" alt="loading" width={18} height={18} className="animate-spin" />
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        >
+          <Loader2 size={18} />
+        </motion.div>
         Redirecting to Paystack...
       </div>
     );
@@ -61,14 +67,21 @@ export function BookingButton({ tripId, userId, tripName, price }: BookingButton
 
   return (
     <div className="flex flex-col gap-3">
-      <button
+      <motion.button
         onClick={handleBooking}
         disabled={loading}
         className="px-8 py-3 bg-primary-100 text-white rounded-lg font-semibold hover:bg-primary-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
       >
         {loading ? (
           <>
-            <Image src="/assets/icons/loader.svg" alt="loading" width={18} height={18} className="animate-spin" />
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            >
+              <Loader2 size={18} />
+            </motion.div>
             Processing...
           </>
         ) : (
@@ -76,10 +89,15 @@ export function BookingButton({ tripId, userId, tripName, price }: BookingButton
             Book Now — {price}
           </>
         )}
-      </button>
+      </motion.button>
 
       <div className="flex items-center justify-center gap-2 text-xs text-gray-100">
-        <Image src="/assets/icons/check.svg" alt="secure" width={14} height={14} />
+        <motion.div
+          whileHover={{ scale: 1.2 }}
+          transition={{ type: "spring", stiffness: 400, damping: 10 }}
+        >
+          <Check size={14} className="text-success-500" />
+        </motion.div>
         <span>Secure payment via Paystack</span>
       </div>
 

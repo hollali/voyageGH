@@ -1,4 +1,7 @@
-import Image from "next/image";
+"use client";
+
+import { motion } from "framer-motion";
+import { Users, Map, TrendingUp, TrendingDown } from "lucide-react";
 import { calculateTrendPercentage } from "~/lib/utils";
 
 interface StatsCardProps {
@@ -13,32 +16,51 @@ export function StatsCard({ headerTitle, total, lastMonthCount, currentMonthCoun
   const isPositive = trend === "increment";
   const isNeutral = trend === "no change";
 
+  const HeaderIcon = headerTitle === "Total Users" ? Users : Map;
+
   return (
-    <article className="stats-card">
+    <motion.article
+      className="stats-card"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+    >
       <header className="flex items-center gap-3">
-        <Image
-          src={headerTitle === "Total Users" ? "/assets/icons/users.svg" : "/assets/icons/itinerary.svg"}
-          alt={headerTitle}
-          width={24}
-          height={24}
-        />
+        <motion.div
+          whileHover={{ scale: 1.1, rotate: 5 }}
+          transition={{ type: "spring", stiffness: 400, damping: 10 }}
+        >
+          <HeaderIcon size={24} className="text-primary-100" />
+        </motion.div>
         <h2 className="text-sm md:text-lg font-semibold text-dark-200">{headerTitle}</h2>
       </header>
       <div className="content">
         <div className="flex flex-col gap-1">
-          <span className="p-40-semibold text-dark-100">{total.toLocaleString()}</span>
+          <motion.span
+            className="p-40-semibold text-dark-100"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            {total.toLocaleString()}
+          </motion.span>
           <span className="text-gray-100 text-sm font-normal">
             vs {lastMonthCount.toLocaleString()} last month
           </span>
         </div>
         <div className="flex items-center gap-2">
           {!isNeutral && (
-            <Image
-              src={isPositive ? "/assets/icons/arrow-up-green.svg" : "/assets/icons/arrow-down-red.svg"}
-              alt={isPositive ? "increment" : "decrement"}
-              width={16}
-              height={16}
-            />
+            <motion.div
+              initial={{ y: isPositive ? 10 : -10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+            >
+              {isPositive ? (
+                <TrendingUp size={16} className="text-success-500" />
+              ) : (
+                <TrendingDown size={16} className="text-red-500" />
+              )}
+            </motion.div>
           )}
           <span
             className={`text-sm font-semibold ${
@@ -50,6 +72,6 @@ export function StatsCard({ headerTitle, total, lastMonthCount, currentMonthCoun
           <span className="text-gray-100 text-xs">This month</span>
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 }

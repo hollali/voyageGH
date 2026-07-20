@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { Users } from "lucide-react";
 import { Sidebar, MobileSidebar } from "~/components/Sidebar";
 import { requireAdmin, getAllUsers } from "~/lib/actions";
 
@@ -26,11 +27,15 @@ export default async function AdminUsersPage() {
         <div className="wrapper py-10">
           <div className="all-users">
             <header className="flex flex-col gap-2">
-              <h1 className="text-xl font-semibold text-dark-100">All Users</h1>
+              <div className="flex items-center gap-2">
+                <Users size={20} className="text-primary-100" />
+                <h1 className="text-xl font-semibold text-dark-100">All Users</h1>
+              </div>
               <p className="text-gray-100">{allUsers.length} registered users</p>
             </header>
 
             <div className="bg-white rounded-20 shadow-400 overflow-hidden">
+              <div className="table-responsive">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-light-400">
@@ -80,6 +85,7 @@ export default async function AdminUsersPage() {
                   )}
                 </tbody>
               </table>
+              </div>
             </div>
           </div>
         </div>

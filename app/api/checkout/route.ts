@@ -4,12 +4,24 @@ import { initializeTransaction, generateReference, ghsToPesewas } from "~/lib/pa
 import { db } from "~/lib/db";
 import { bookings, trips, users } from "~/lib/db/schema";
 import { eq, and } from "drizzle-orm";
+import { checkRateLimit, getRateLimitHeaders } from "~/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const rateKey = `checkout:${userId}`;
+    const rateLimit = checkRateLimit(rateKey, 10, 60000);
+    const headers = getRateLimitHeaders(rateKey, 10);
+
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: `Rate limit exceeded. Try again in ${rateLimit.retryAfter}s` },
+        { status: 429, headers }
+      );
     }
 
     const { tripId } = await request.json();

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import { Trash2 } from "lucide-react";
 
 interface DeleteTripButtonProps {
   tripId: number;
@@ -32,36 +33,39 @@ export function DeleteTripButton({ tripId, tripName }: DeleteTripButtonProps) {
     return (
       <div className="flex items-center gap-2">
         <span className="text-xs text-gray-100">Delete?</span>
-        <button
+        <motion.button
           onClick={handleDelete}
           disabled={loading}
           className="px-3 py-1 bg-red-500 text-white text-xs rounded-lg font-medium hover:bg-red-600 transition-colors disabled:opacity-50"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
           {loading ? "..." : "Yes"}
-        </button>
-        <button
+        </motion.button>
+        <motion.button
           onClick={() => setShowConfirm(false)}
           className="px-3 py-1 bg-light-500 text-dark-200 text-xs rounded-lg font-medium hover:bg-light-400 transition-colors"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
           No
-        </button>
+        </motion.button>
       </div>
     );
   }
 
   return (
-    <button
+    <motion.button
       onClick={() => setShowConfirm(true)}
       className="p-2 rounded-lg hover:bg-red-50 transition-colors group"
       title="Delete trip"
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.9 }}
     >
-      <Image
-        src="/assets/icons/trash.svg"
-        alt="delete"
-        width={16}
-        height={16}
-        className="opacity-50 group-hover:opacity-100"
+      <Trash2
+        size={16}
+        className="text-gray-100 group-hover:text-red-500 transition-colors"
       />
-    </button>
+    </motion.button>
   );
 }
