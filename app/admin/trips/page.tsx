@@ -38,12 +38,12 @@ export default async function AdminTripsPage() {
               <div className="bg-white rounded-20 shadow-400 p-12 text-center">
                 <Sparkles size={48} className="mx-auto mb-4 text-primary-100 opacity-50" />
                 <p className="text-gray-100 text-lg">No trips generated yet.</p>
-                <a
+                <Link
                   href="/admin/create-trip"
                   className="mt-4 inline-block px-6 py-3 bg-primary-100 text-white rounded-lg font-semibold hover:bg-primary-500 transition-colors"
                 >
                   Generate Your First Trip
-                </a>
+                </Link>
               </div>
             ) : (
               <div className="bg-white rounded-20 shadow-400 overflow-hidden">
