@@ -1,12 +1,9 @@
 import Link from "next/link";
 import { MapPinOff } from "lucide-react";
-import { Header } from "~/components/Header";
-import { Footer } from "~/components/Footer";
 
 export default function NotFound() {
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
       <main className="wrapper py-20 flex-1 flex flex-col items-center justify-center text-center gap-6">
         <MapPinOff size={80} className="text-primary-100 opacity-30 animate-bounce-subtle" />
         <h1 className="text-8xl font-bold text-primary-100">404</h1>
@@ -22,14 +19,13 @@ export default function NotFound() {
             Go Home
           </Link>
           <Link
-            href="/trips"
+            href="/en/trips"
             className="px-6 py-3 border border-light-400 text-dark-200 rounded-lg font-semibold hover:bg-light-200 transition-colors"
           >
             Browse Trips
           </Link>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

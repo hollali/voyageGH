@@ -1,7 +1,16 @@
+import { ClerkProvider } from "@clerk/nextjs";
+import "./globals.css";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return children;
+  return (
+    <html lang="en" dir="ltr">
+      <body className="antialiased">
+        <ClerkProvider>{children}</ClerkProvider>
+      </body>
+    </html>
+  );
 }
