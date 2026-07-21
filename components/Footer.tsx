@@ -1,9 +1,11 @@
+"use client";
+
 import Image from "next/image";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 import { Link } from "~/lib/i18n/routing";
 
-export async function Footer() {
-  const t = await getTranslations("footer");
+export function Footer() {
+  const t = useTranslations("footer");
 
   return (
     <footer className="wrapper py-10 border-t border-light-100">
