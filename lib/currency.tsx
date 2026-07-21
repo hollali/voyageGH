@@ -6,6 +6,7 @@ import React, {
   useState,
   useEffect,
   useCallback,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 
@@ -145,14 +146,30 @@ function getLocaleForCurrency(code: string): string {
   );
 }
 
+function getInitialCurrency() {
+  return "USD";
+}
+
+function getSnapshotCurrency() {
+  return detectCurrency();
+}
+
+function subscribeCurrency(callback: () => void) {
+  window.addEventListener("storage", callback);
+  return () => window.removeEventListener("storage", callback);
+}
+
 export function CurrencyProvider({ children }: { children: ReactNode }) {
-  const [currency, setCurrencyState] = useState<string>(() => detectCurrency());
+  const currency = useSyncExternalStore(
+    subscribeCurrency,
+    getSnapshotCurrency,
+    getInitialCurrency
+  );
   const [rates, setRates] = useState<Record<string, number>>(FALLBACK_RATES);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   const setCurrency = useCallback((code: string) => {
     if (!SUPPORTED_CURRENCIES.some((c) => c.code === code)) return;
-    setCurrencyState(code);
     localStorage.setItem(STORAGE_CURRENCY, code);
   }, []);
 
