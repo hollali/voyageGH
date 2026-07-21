@@ -8,6 +8,7 @@ export const users = pgTable("users", {
   imageUrl: text("image_url"),
   joinedAt: timestamp("joined_at", { withTimezone: true }).notNull().defaultNow(),
   status: varchar("status", { length: 20 }).notNull().default("user"),
+  passwordHash: varchar("password_hash", { length: 255 }),
   itineraryCreated: integer("itinerary_created").notNull().default(0),
 });
 

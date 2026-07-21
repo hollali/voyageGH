@@ -239,7 +239,7 @@ export default function CreateTripPage() {
                     )}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-[400px] text-gray-100">
+                  <div className="flex flex-col items-center justify-center h-100 text-gray-100">
                     <Map size={48} className="mb-4 opacity-50" />
                     <p>Generated itinerary will appear here</p>
                   </div>

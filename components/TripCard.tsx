@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { MapPin } from "lucide-react";
+import { Link } from "~/lib/i18n/routing";
+import { useCurrency } from "~/lib/currency";
 
 interface TripCardProps {
   id: number;
@@ -15,6 +16,8 @@ interface TripCardProps {
 }
 
 export function TripCard({ id, name, location, imageUrl, tags, price }: TripCardProps) {
+  const { parseAndFormatPrice } = useCurrency();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -31,7 +34,7 @@ export function TripCard({ id, name, location, imageUrl, tags, price }: TripCard
             height={160}
             className="w-full h-[160px] rounded-t-xl object-cover"
           />
-          <span className="tripCard-pill">{price}</span>
+          <span className="tripCard-pill">{parseAndFormatPrice(price)}</span>
         </div>
         <article className="flex flex-col gap-3 mt-4 pl-[18px] pr-3.5 pb-5">
           <h2 className="text-sm md:text-lg font-semibold text-dark-100 line-clamp-2">{name}</h2>

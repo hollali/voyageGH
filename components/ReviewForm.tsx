@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Star, Check } from "lucide-react";
 import { useToast } from "~/components/Toast";
@@ -18,6 +19,7 @@ export function ReviewForm({ tripId }: ReviewFormProps) {
   const [submitted, setSubmitted] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const t = useTranslations("review");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +37,7 @@ export function ReviewForm({ tripId }: ReviewFormProps) {
       setComment("");
       router.refresh();
     } catch {
-        toast("Failed to submit review. Please try again.", "error");
+        toast(t("failedSubmit"), "error");
     } finally {
       setLoading(false);
     }
@@ -55,18 +57,17 @@ export function ReviewForm({ tripId }: ReviewFormProps) {
         >
           <Check size={20} />
         </motion.div>
-        <span className="font-medium">Review submitted! Thank you for your feedback.</span>
+        <span className="font-medium">{t("reviewSubmitted")}</span>
       </motion.div>
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 rounded-20 shadow-300 flex flex-col gap-4">
-      <h4 className="p-18-semibold text-dark-100">Write a Review</h4>
+      <h4 className="p-18-semibold text-dark-100">{t("writeReview")}</h4>
 
-      {/* Star Rating */}
       <div className="flex items-center gap-2">
-        <span className="text-sm text-gray-100">Rating:</span>
+        <span className="text-sm text-gray-100">{t("rating")}</span>
         <div className="flex gap-1" role="radiogroup" aria-label="Rating">
           {[1, 2, 3, 4, 5].map((star) => (
             <motion.button
@@ -90,11 +91,10 @@ export function ReviewForm({ tripId }: ReviewFormProps) {
         </div>
       </div>
 
-      {/* Comment */}
       <textarea
         value={comment}
         onChange={(e) => setComment(e.target.value)}
-        placeholder="Share your experience..."
+        placeholder={t("shareExperience")}
         rows={3}
         className="p-3.5 border border-light-400 rounded-xl text-base text-dark-300 font-normal resize-none focus:outline-none focus:border-primary-100"
       />
@@ -106,7 +106,7 @@ export function ReviewForm({ tripId }: ReviewFormProps) {
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
-        {loading ? "Submitting..." : "Submit Review"}
+        {loading ? t("submitting") : t("submitReview")}
       </motion.button>
     </form>
   );

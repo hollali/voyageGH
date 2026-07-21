@@ -5,7 +5,7 @@ export default function TripDetailLoading() {
       <div className="wrapper py-10 flex-1">
         <div className="flex flex-col gap-8">
           {/* Hero skeleton */}
-          <div className="h-[400px] bg-light-200 rounded-20 animate-pulse" />
+          <div className="h-100 bg-light-200 rounded-20 animate-pulse" />
           {/* Content skeleton */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 flex flex-col gap-6">

@@ -6,6 +6,12 @@ export const sidebarItems = [
     href: "/admin/dashboard",
   },
   {
+    id: 2,
+    icon: "itinerary",
+    label: "Bookings",
+    href: "/admin/bookings",
+  },
+  {
     id: 3,
     icon: "users",
     label: "All Users",

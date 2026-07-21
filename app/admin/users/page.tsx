@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { Users } from "lucide-react";
 import { Sidebar, MobileSidebar } from "~/components/Sidebar";
-import { requireAdmin, getAllUsers } from "~/lib/actions";
+import { getAllUsers } from "~/lib/actions";
+import { UserActions } from "~/components/UserActions";
 
 export const metadata = {
   title: "All Users | VoyageGH",
@@ -9,13 +10,6 @@ export const metadata = {
 };
 
 export default async function AdminUsersPage() {
-  let admin;
-  try {
-    admin = await requireAdmin();
-  } catch {
-    redirect("/");
-  }
-
   const allUsers = await getAllUsers();
 
   return (
@@ -38,18 +32,19 @@ export default async function AdminUsersPage() {
               <div className="table-responsive">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-light-400">
-                    <th className="text-left p-4 text-sm font-semibold text-dark-200">User</th>
-                    <th className="text-left p-4 text-sm font-semibold text-dark-200">Email</th>
-                    <th className="text-left p-4 text-sm font-semibold text-dark-200">Role</th>
-                    <th className="text-left p-4 text-sm font-semibold text-dark-200">Joined</th>
-                    <th className="text-left p-4 text-sm font-semibold text-dark-200">Trips</th>
-                  </tr>
+                    <tr className="border-b border-light-400">
+                      <th className="text-left p-4 text-sm font-semibold text-dark-200">User</th>
+                      <th className="text-left p-4 text-sm font-semibold text-dark-200">Email</th>
+                      <th className="text-left p-4 text-sm font-semibold text-dark-200">Role</th>
+                      <th className="text-left p-4 text-sm font-semibold text-dark-200">Joined</th>
+                      <th className="text-left p-4 text-sm font-semibold text-dark-200">Trips</th>
+                      <th className="text-right p-4 text-sm font-semibold text-dark-200">Actions</th>
+                    </tr>
                 </thead>
                 <tbody>
                   {allUsers.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="p-8 text-center text-gray-100">
+                      <td colSpan={6} className="p-8 text-center text-gray-100">
                         No users yet.
                       </td>
                     </tr>
@@ -80,6 +75,9 @@ export default async function AdminUsersPage() {
                           })}
                         </td>
                         <td className="p-4 text-sm text-gray-100">{user.itineraryCreated}</td>
+                        <td className="p-4 text-right">
+                          <UserActions userId={user.id} currentStatus={user.status} userName={user.name} />
+                        </td>
                       </tr>
                     ))
                   )}

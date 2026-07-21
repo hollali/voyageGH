@@ -1,17 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { SignInButton, UserButton } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
+import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import { Link } from "~/lib/i18n/routing";
+import { LanguageSwitcher } from "~/components/LanguageSwitcher";
+import { CurrencySwitcher } from "~/components/CurrencySwitcher";
 
 export function Header() {
-  const { isSignedIn, user } = useUser();
-  const isAdmin = user?.publicMetadata?.role === "admin";
+  const { isSignedIn } = useUser();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const t = useTranslations("nav");
 
   return (
     <header className="root-nav wrapper">
@@ -21,12 +24,14 @@ export function Header() {
       </Link>
 
       {/* Desktop nav */}
-      <aside className="hidden md:flex gap-4 items-center">
+      <aside className="hidden md:flex gap-3 items-center">
+        <LanguageSwitcher />
+        <CurrencySwitcher />
         <Link
           href="/trips"
           className="text-sm font-medium text-dark-200 hover:text-primary-100 transition-colors"
         >
-          Browse Trips
+          {t("browseTrips")}
         </Link>
         {isSignedIn ? (
           <>
@@ -34,16 +39,14 @@ export function Header() {
               href="/dashboard"
               className="flex items-center gap-2 px-4 py-2 rounded-lg border border-light-400 text-dark-200 text-sm font-semibold hover:bg-light-200 transition-colors"
             >
-              My Dashboard
+              {t("myDashboard")}
             </Link>
-            {isAdmin && (
-              <Link
-                href="/admin/dashboard"
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-100 text-white text-sm font-semibold hover:bg-primary-500 transition-colors"
-              >
-                Admin
-              </Link>
-            )}
+            <Link
+              href="/admin/login"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-100 text-white text-sm font-semibold hover:bg-primary-500 transition-colors"
+            >
+              {t("admin")}
+            </Link>
             <UserButton
               appearance={{
                 elements: {
@@ -55,7 +58,7 @@ export function Header() {
         ) : (
           <SignInButton mode="modal">
             <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-100 text-white text-sm font-semibold hover:bg-primary-500 transition-colors">
-              Sign In
+              {t("signIn")}
             </button>
           </SignInButton>
         )}
@@ -104,12 +107,16 @@ export function Header() {
             className="absolute top-full left-0 right-0 bg-white border-b border-light-100 shadow-lg md:hidden z-50"
           >
             <nav className="wrapper flex flex-col gap-2 py-4">
+              <div className="flex gap-2 px-4 py-2">
+                <LanguageSwitcher />
+                <CurrencySwitcher />
+              </div>
               <Link
                 href="/trips"
                 onClick={() => setMobileOpen(false)}
                 className="px-4 py-3 text-sm font-medium text-dark-200 hover:bg-light-200 rounded-lg transition-colors"
               >
-                Browse Trips
+                {t("browseTrips")}
               </Link>
               {isSignedIn ? (
                 <>
@@ -118,17 +125,15 @@ export function Header() {
                     onClick={() => setMobileOpen(false)}
                     className="px-4 py-3 text-sm font-medium text-dark-200 hover:bg-light-200 rounded-lg transition-colors"
                   >
-                    My Dashboard
+                    {t("myDashboard")}
                   </Link>
-                  {isAdmin && (
-                    <Link
-                      href="/admin/dashboard"
-                      onClick={() => setMobileOpen(false)}
-                      className="px-4 py-3 text-sm font-medium text-primary-100 hover:bg-primary-100/10 rounded-lg transition-colors"
-                    >
-                      Admin Dashboard
-                    </Link>
-                  )}
+                  <Link
+                    href="/admin/login"
+                    onClick={() => setMobileOpen(false)}
+                    className="px-4 py-3 text-sm font-medium text-primary-100 hover:bg-primary-100/10 rounded-lg transition-colors"
+                  >
+                    {t("admin")}
+                  </Link>
                   <div className="px-4 py-3">
                     <UserButton
                       appearance={{
@@ -143,7 +148,7 @@ export function Header() {
                 <div className="px-4 py-3">
                   <SignInButton mode="modal">
                     <button className="w-full px-4 py-3 bg-primary-100 text-white rounded-lg font-semibold hover:bg-primary-500 transition-colors">
-                      Sign In
+                      {t("signIn")}
                     </button>
                   </SignInButton>
                 </div>

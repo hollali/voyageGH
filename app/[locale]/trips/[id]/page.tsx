@@ -1,7 +1,8 @@
 import Image from "next/image";
-import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { ChevronLeft, MapPin, Star, Calendar, DollarSign, Users, Compass, Sparkles, Thermometer } from "lucide-react";
+import { getTranslations } from "next-intl/server";
+import { Link } from "~/lib/i18n/routing";
 import { Header } from "~/components/Header";
 import { Footer } from "~/components/Footer";
 import { getTripById, getReviewsByTrip, getAverageRating } from "~/lib/actions";
@@ -57,7 +58,7 @@ async function findRating(tripId: number) {
   }
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+export async function generateMetadata({ params }: { params: Promise<{ id: string; locale: string }> }) {
   const { id } = await params;
   const trip = await findTrip(Number(id));
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://voyagegh.netlify.app";
@@ -89,8 +90,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   };
 }
 
-export default async function TripDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function TripDetailPage({ params }: { params: Promise<{ id: string; locale: string }> }) {
   const { id } = await params;
+  const t = await getTranslations("tripDetail");
   const trip = await findTrip(Number(id));
   if (!trip) notFound();
 
@@ -108,10 +110,10 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
   const thumbnailImages = galleryImages.slice(1);
 
   const quickInfoItems = [
-    { icon: <Calendar size={24} className="text-primary-100" />, label: "Duration", value: `${trip.duration} days` },
-    { icon: <DollarSign size={24} className="text-primary-100" />, label: "Budget", value: trip.budget },
-    { icon: <Users size={24} className="text-primary-100" />, label: "Group", value: trip.groupType },
-    { icon: <Compass size={24} className="text-primary-100" />, label: "Style", value: trip.travelStyle },
+    { icon: <Calendar size={24} className="text-primary-100" />, label: t("duration"), value: `${trip.duration} ${t("days")}` },
+    { icon: <DollarSign size={24} className="text-primary-100" />, label: t("budget"), value: trip.budget },
+    { icon: <Users size={24} className="text-primary-100" />, label: t("group"), value: trip.groupType },
+    { icon: <Compass size={24} className="text-primary-100" />, label: t("style"), value: trip.travelStyle },
   ];
 
   return (
@@ -134,7 +136,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
             className="inline-flex items-center gap-2 text-white/80 text-sm mb-4 hover:text-white transition-colors"
           >
             <ChevronLeft size={16} />
-            Back to Trips
+            {t("backToTrips")}
           </Link>
           <h1 className="text-2xl md:text-4xl font-bold text-white mb-2">{trip.name}</h1>
           <div className="flex items-center gap-4 flex-wrap">
@@ -177,7 +179,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
 
             {/* Description */}
             <div className="bg-white p-6 md:p-8 rounded-20 shadow-300">
-              <h2 className="text-lg font-semibold text-dark-100 mb-4">About This Trip</h2>
+              <h2 className="text-lg font-semibold text-dark-100 mb-4">{t("aboutTrip")}</h2>
               <p className="text-dark-400 text-base leading-relaxed">{trip.description}</p>
             </div>
 
@@ -195,7 +197,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
             {/* Day-by-Day Itinerary */}
             {trip.itinerary && trip.itinerary.length > 0 && (
               <div className="bg-white p-6 md:p-8 rounded-20 shadow-300">
-                <h2 className="text-lg font-semibold text-dark-100 mb-6">Day-by-Day Itinerary</h2>
+                <h2 className="text-lg font-semibold text-dark-100 mb-6">{t("itinerary")}</h2>
                 <div className="relative">
                   {/* Timeline line */}
                   <div className="absolute left-[19px] top-0 bottom-0 w-[2px] bg-light-400" />
@@ -235,7 +237,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
             {/* Best Time to Visit */}
             {trip.bestTimeToVisit && trip.bestTimeToVisit.length > 0 && (
               <div className="bg-white p-6 md:p-8 rounded-20 shadow-300">
-                <h2 className="text-lg font-semibold text-dark-100 mb-4">Best Time to Visit</h2>
+                <h2 className="text-lg font-semibold text-dark-100 mb-4">{t("bestTime")}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {trip.bestTimeToVisit.map((info, i) => (
                     <div key={i} className="flex items-start gap-3 p-3 bg-light-200 rounded-xl">
@@ -250,7 +252,7 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
             {/* Weather Info */}
             {trip.weatherInfo && trip.weatherInfo.length > 0 && (
               <div className="bg-white p-6 md:p-8 rounded-20 shadow-300">
-                <h2 className="text-lg font-semibold text-dark-100 mb-4">Weather Information</h2>
+                <h2 className="text-lg font-semibold text-dark-100 mb-4">{t("weather")}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {trip.weatherInfo.map((info, i) => (
                     <div key={i} className="flex items-start gap-3 p-3 bg-light-200 rounded-xl">
@@ -281,15 +283,15 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
             {/* Reviews Section */}
             <div className="bg-white p-6 md:p-8 rounded-20 shadow-300">
               <h2 className="text-lg font-semibold text-dark-100 mb-6">
-                Reviews ({tripReviews.length})
+                {t("reviews")} ({tripReviews.length})
               </h2>
 
               {userId && <ReviewForm tripId={trip.id} userId={userId} />}
 
               {tripReviews.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-gray-100 mb-2">No reviews yet</p>
-                  <p className="text-sm text-gray-200">Be the first to review this trip!</p>
+                  <p className="text-gray-100 mb-2">{t("noReviews")}</p>
+                  <p className="text-sm text-gray-200">{t("beFirst")}</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-4">
@@ -336,29 +338,29 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
               <div className="bg-white p-6 rounded-20 shadow-400 border border-light-400">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <p className="text-xs text-gray-100 mb-1">Starting from</p>
+                    <p className="text-xs text-gray-100 mb-1">{t("startingFrom")}</p>
                     <p className="text-2xl font-bold text-dark-100">{trip.estimatedPrice}</p>
                   </div>
                   <span className="px-3 py-1.5 bg-success-50 text-success-700 text-xs rounded-full font-medium">
-                    Available
+                    {t("available")}
                   </span>
                 </div>
 
                 <div className="flex flex-col gap-3 mb-6">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-100">Duration</span>
-                    <span className="font-medium text-dark-100">{trip.duration} days</span>
+                    <span className="text-gray-100">{t("duration")}</span>
+                    <span className="font-medium text-dark-100">{trip.duration} {t("days")}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-100">Group Type</span>
+                    <span className="text-gray-100">{t("groupType")}</span>
                     <span className="font-medium text-dark-100">{trip.groupType}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-100">Travel Style</span>
+                    <span className="text-gray-100">{t("travelStyle")}</span>
                     <span className="font-medium text-dark-100">{trip.travelStyle}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-100">Budget</span>
+                    <span className="text-gray-100">{t("budget")}</span>
                     <span className="font-medium text-dark-100">{trip.budget}</span>
                   </div>
                 </div>
@@ -366,14 +368,14 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
                 <BookingButton tripId={trip.id} userId={userId} tripName={trip.name} price={trip.estimatedPrice || ""} />
 
                 <p className="text-xs text-gray-100 text-center mt-3">
-                  Free cancellation up to 48 hours before departure
+                  {t("freeCancellation")}
                 </p>
               </div>
 
               {/* Interests Card */}
               {trip.interests && (
                 <div className="bg-white p-6 rounded-20 shadow-400 border border-light-400">
-                  <h3 className="text-sm font-semibold text-dark-100 mb-3">Interests</h3>
+                  <h3 className="text-sm font-semibold text-dark-100 mb-3">{t("interests")}</h3>
                   <div className="flex flex-wrap gap-2">
                     {trip.interests.split(",").map((interest, i) => (
                       <span
@@ -394,15 +396,15 @@ export default async function TripDetailPage({ params }: { params: Promise<{ id:
                   className="flex items-center justify-center gap-2 px-6 py-3 border border-primary-100 text-primary-100 rounded-xl font-semibold hover:bg-primary-50 transition-colors text-sm"
                 >
                   <Sparkles size={18} />
-                  Create Similar Trip with AI
+                  {t("createSimilar")}
                 </Link>
               )}
 
               {/* Help Card */}
               <div className="bg-primary-50 p-5 rounded-20 border border-primary-100/20">
-                <h3 className="text-sm font-semibold text-dark-100 mb-2">Need Help?</h3>
+                <h3 className="text-sm font-semibold text-dark-100 mb-2">{t("needHelp")}</h3>
                 <p className="text-xs text-gray-100 leading-relaxed">
-                  Our travel experts can customize this itinerary for your group. Contact us for a personalized quote.
+                  {t("helpText")}
                 </p>
               </div>
             </div>

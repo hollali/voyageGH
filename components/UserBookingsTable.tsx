@@ -1,8 +1,10 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { CancelBookingButton } from "~/components/CancelBookingButton";
+import { Link } from "~/lib/i18n/routing";
+import { useCurrency } from "~/lib/currency";
 
 interface BookingEntry {
   booking: {
@@ -44,19 +46,22 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export function UserBookingsTable({ bookings }: UserBookingsTableProps) {
+  const t = useTranslations("bookings");
+  const { parseAndFormatPrice } = useCurrency();
+
   return (
     <div className="bg-white rounded-20 shadow-400 overflow-hidden">
       <div className="p-6 border-b border-light-400">
-        <h2 className="p-18-semibold text-dark-100">Recent Bookings</h2>
+        <h2 className="p-18-semibold text-dark-100">{t("recentBookings")}</h2>
       </div>
       {bookings.length === 0 ? (
         <div className="p-12 text-center">
-          <p className="text-gray-100 mb-4">No bookings yet.</p>
+          <p className="text-gray-100 mb-4">{t("noBookings")}</p>
           <Link
             href="/trips"
             className="inline-block px-6 py-3 bg-primary-100 text-white rounded-lg font-semibold hover:bg-primary-500 transition-colors"
           >
-            Browse Trips
+            {t("recentBookings")}
           </Link>
         </div>
       ) : (
@@ -64,12 +69,12 @@ export function UserBookingsTable({ bookings }: UserBookingsTableProps) {
         <table className="w-full">
           <thead>
             <tr className="border-b border-light-400">
-              <th className="text-left p-4 text-sm font-semibold text-dark-200">Trip</th>
-              <th className="text-left p-4 text-sm font-semibold text-dark-200">Region</th>
-              <th className="text-left p-4 text-sm font-semibold text-dark-200">Price</th>
-              <th className="text-left p-4 text-sm font-semibold text-dark-200">Status</th>
-              <th className="text-left p-4 text-sm font-semibold text-dark-200">Date</th>
-              <th className="text-left p-4 text-sm font-semibold text-dark-200">Action</th>
+              <th className="text-left p-4 text-sm font-semibold text-dark-200">{t("trip")}</th>
+              <th className="text-left p-4 text-sm font-semibold text-dark-200">{t("region")}</th>
+              <th className="text-left p-4 text-sm font-semibold text-dark-200">{t("price")}</th>
+              <th className="text-left p-4 text-sm font-semibold text-dark-200">{t("status")}</th>
+              <th className="text-left p-4 text-sm font-semibold text-dark-200">{t("date")}</th>
+              <th className="text-left p-4 text-sm font-semibold text-dark-200">{t("action")}</th>
             </tr>
           </thead>
           <tbody>
@@ -83,7 +88,9 @@ export function UserBookingsTable({ bookings }: UserBookingsTableProps) {
               >
                 <td className="p-4 text-sm font-medium text-dark-100">{trip.name}</td>
                 <td className="p-4 text-sm text-gray-100">{trip.country}</td>
-                <td className="p-4 text-sm text-gray-100">{trip.estimatedPrice}</td>
+                <td className="p-4 text-sm text-gray-100">
+                  {trip.estimatedPrice ? parseAndFormatPrice(trip.estimatedPrice) : "-"}
+                </td>
                 <td className="p-4">
                   <StatusBadge status={booking.status} />
                 </td>

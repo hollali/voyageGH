@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin/", "/api/", "/dashboard/"],
+        disallow: ["/admin/", "/api/"],
       },
     ],
     sitemap: "https://voyagegh.netlify.app/sitemap.xml",

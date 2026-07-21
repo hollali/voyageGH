@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { Loader2, Check, CreditCard } from "lucide-react";
+import { Loader2, Check } from "lucide-react";
 
 interface BookingButtonProps {
   tripId: number;
@@ -12,11 +13,12 @@ interface BookingButtonProps {
   price: string;
 }
 
-export function BookingButton({ tripId, userId, tripName, price }: BookingButtonProps) {
+export function BookingButton({ tripId, userId, price }: BookingButtonProps) {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error" | "redirecting">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const router = useRouter();
+  const t = useTranslations("payment");
 
   const handleBooking = async () => {
     if (!userId) {
@@ -36,7 +38,7 @@ export function BookingButton({ tripId, userId, tripName, price }: BookingButton
       const data = await res.json();
 
       if (!res.ok) {
-        setErrorMsg(data.error || "Booking failed");
+        setErrorMsg(data.error || t("bookingFailed"));
         setStatus("error");
         return;
       }
@@ -44,7 +46,7 @@ export function BookingButton({ tripId, userId, tripName, price }: BookingButton
       setStatus("redirecting");
       window.location.href = data.authorizationUrl;
     } catch {
-      setErrorMsg("Something went wrong. Please try again.");
+      setErrorMsg(t("tryAgain"));
       setStatus("error");
     } finally {
       setLoading(false);
@@ -60,7 +62,7 @@ export function BookingButton({ tripId, userId, tripName, price }: BookingButton
         >
           <Loader2 size={18} />
         </motion.div>
-        Redirecting to Paystack...
+        {t("redirecting")}
       </div>
     );
   }
@@ -82,11 +84,11 @@ export function BookingButton({ tripId, userId, tripName, price }: BookingButton
             >
               <Loader2 size={18} />
             </motion.div>
-            Processing...
+            {t("processing")}
           </>
         ) : (
           <>
-            Book Now — {price}
+            {t("processing")} — {price}
           </>
         )}
       </motion.button>
@@ -98,7 +100,7 @@ export function BookingButton({ tripId, userId, tripName, price }: BookingButton
         >
           <Check size={14} className="text-success-500" />
         </motion.div>
-        <span>Secure payment via Paystack</span>
+        <span>{t("securePayment")}</span>
       </div>
 
       <div className="flex items-center justify-center gap-3 text-xs text-gray-100 mt-1">

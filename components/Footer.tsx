@@ -1,7 +1,10 @@
-import Link from "next/link";
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
+import { Link } from "~/lib/i18n/routing";
 
-export function Footer() {
+export async function Footer() {
+  const t = await getTranslations("footer");
+
   return (
     <footer className="wrapper py-10 border-t border-light-100">
       <div className="footer-container">
@@ -11,10 +14,13 @@ export function Footer() {
         </Link>
         <div className="flex items-center gap-2 sm:gap-5">
           <Link href="/terms" className="text-sm md:text-base font-normal text-gray-100 hover:text-dark-100 transition-colors">
-            Terms &amp; Conditions
+            {t("terms")}
           </Link>
           <Link href="/privacy" className="text-sm md:text-base font-normal text-gray-100 hover:text-dark-100 transition-colors">
-            Privacy Policy
+            {t("privacy")}
+          </Link>
+          <Link href="/admin/login" className="text-sm md:text-base font-normal text-gray-100 hover:text-dark-100 transition-colors">
+            Admin
           </Link>
         </div>
       </div>

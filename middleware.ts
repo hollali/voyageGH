@@ -1,41 +1,60 @@
+import createMiddleware from "next-intl/middleware";
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
+import { routing } from "~/lib/i18n/routing";
+
+const intlMiddleware = createMiddleware(routing);
 
 const isPublicRoute = createRouteMatcher([
-  "/",
-  "/trips(.*)",
-  "/sign-in(.*)",
-  "/sign-up(.*)",
-  "/terms(.*)",
-  "/privacy(.*)",
+  "/:locale",
+  "/:locale/trips(.*)",
+  "/:locale/terms(.*)",
+  "/:locale/privacy(.*)",
   "/api/trips(.*)",
 ]);
 
 const isAdminRoute = createRouteMatcher([
-  "/admin(.*)",
-  "/api/admin(.*)",
+  "/admin/dashboard(.*)",
+  "/admin/trips(.*)",
+  "/admin/users(.*)",
+  "/admin/bookings(.*)",
+  "/admin/create-trip(.*)",
+  "/api/admin/trips(.*)",
+  "/api/admin/users(.*)",
+  "/api/admin/bookings(.*)",
+]);
+
+const isAdminLoginRoute = createRouteMatcher([
+  "/admin/login",
+  "/api/admin/auth/login",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
+  if (isAdminLoginRoute(req)) {
+    return intlMiddleware(req) || NextResponse.next();
+  }
+
   if (isAdminRoute(req)) {
-    await auth.protect();
-    const { userId } = await auth();
-    if (userId) {
-      const { db } = await import("~/lib/db");
-      const { users } = await import("~/lib/db/schema");
-      const { eq } = await import("drizzle-orm");
-      const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
-      if (!user || user.status !== "admin") {
-        return Response.redirect(new URL("/dashboard", req.url));
-      }
+    const { getAdminSession } = await import("~/lib/auth");
+    const session = await getAdminSession();
+    if (!session || session.role !== "admin") {
+      return Response.redirect(new URL("/admin/login", req.url));
     }
-  } else if (!isPublicRoute(req)) {
+    return NextResponse.next();
+  }
+
+  const intlResponse = intlMiddleware(req);
+  if (intlResponse) return intlResponse;
+
+  if (!isPublicRoute(req)) {
     await auth.protect();
   }
+
+  return NextResponse.next();
 });
 
 export const config = {
   matcher: [
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    "/(api|trpc)(.*)",
+    "/((?!_next|api|admin|assets|favicon.ico|robots.txt|sitemap.xml).*)",
   ],
 };

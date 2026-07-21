@@ -177,6 +177,50 @@ export async function getAllUsers() {
   return db.select().from(users).orderBy(desc(users.joinedAt));
 }
 
+export async function updateUserRole(id: string, status: "user" | "admin") {
+  const result = await db.update(users).set({ status }).where(eq(users.id, id)).returning();
+  return result[0];
+}
+
+export async function deleteUser(id: string) {
+  await db.delete(users).where(eq(users.id, id));
+}
+
+// ===== BOOKINGS (ADMIN) =====
+
+export async function getAllBookingsAdmin() {
+  return db
+    .select({
+      booking: bookings,
+      trip: trips,
+      user: users,
+    })
+    .from(bookings)
+    .innerJoin(trips, eq(bookings.tripId, trips.id))
+    .innerJoin(users, eq(bookings.userId, users.id))
+    .orderBy(desc(bookings.createdAt));
+}
+
+export async function getBookingCountByTrip(tripId: number) {
+  const [result] = await db
+    .select({ count: count() })
+    .from(bookings)
+    .where(eq(bookings.tripId, tripId));
+  return result.count;
+}
+
+export async function getBookingCountsByTrips() {
+  const results = await db
+    .select({
+      tripId: bookings.tripId,
+      count: count(),
+    })
+    .from(bookings)
+    .groupBy(bookings.tripId);
+
+  return new Map(results.map((r) => [r.tripId, r.count]));
+}
+
 // ===== DASHBOARD STATS =====
 
 export async function getDashboardStats() {

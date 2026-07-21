@@ -1,10 +1,9 @@
-import { redirect } from "next/navigation";
 import { BarChart3 } from "lucide-react";
 import { Sidebar, MobileSidebar } from "~/components/Sidebar";
 import { StatsCard } from "~/components/StatsCard";
 import { UserGrowthChart } from "~/components/charts/UserGrowthChart";
 import { TripDistributionChart } from "~/components/charts/TripDistributionChart";
-import { getDashboardStats, getRecentTrips, requireAdmin, getMonthlyGrowthData, getTripDistributionByGroupType } from "~/lib/actions";
+import { getDashboardStats, getRecentTrips, getMonthlyGrowthData, getTripDistributionByGroupType } from "~/lib/actions";
 
 export const metadata = {
   title: "Admin Dashboard | VoyageGH",
@@ -12,12 +11,6 @@ export const metadata = {
 };
 
 export default async function AdminDashboardPage() {
-  try {
-    await requireAdmin();
-  } catch {
-    redirect("/");
-  }
-
   const [stats, recentTrips, growthData, distributionData] = await Promise.all([
     getDashboardStats(),
     getRecentTrips(5),

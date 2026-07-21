@@ -1,12 +1,13 @@
 "use client";
 
-import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Check, X, AlertTriangle } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 
 export function PaymentAlert({ status }: { status: string }) {
   const [visible, setVisible] = useState(true);
+  const t = useTranslations("payment");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -27,7 +28,7 @@ export function PaymentAlert({ status }: { status: string }) {
         className="bg-success-50 border border-success-500/20 p-4 rounded-xl flex items-center gap-3"
       >
         <Check size={20} className="text-success-500" />
-        <span className="text-success-700 font-medium">Payment successful! Your booking is confirmed.</span>
+        <span className="text-success-700 font-medium">{t("success")}</span>
         <button onClick={() => setVisible(false)} className="ml-auto text-success-700 hover:text-success-500">&times;</button>
       </motion.div>
     );
@@ -40,7 +41,7 @@ export function PaymentAlert({ status }: { status: string }) {
         className="bg-red-50 border border-red-500/20 p-4 rounded-xl flex items-center gap-3"
       >
         <X size={20} className="text-red-500" />
-        <span className="text-red-500 font-medium">Payment was not completed. Please try again.</span>
+        <span className="text-red-500 font-medium">{t("failed")}</span>
         <button onClick={() => setVisible(false)} className="ml-auto text-red-500 hover:text-red-600">&times;</button>
       </motion.div>
     );
@@ -52,7 +53,7 @@ export function PaymentAlert({ status }: { status: string }) {
       className="bg-yellow-50 border border-yellow-500/20 p-4 rounded-xl flex items-center gap-3"
     >
       <AlertTriangle size={20} className="text-yellow-700" />
-      <span className="text-yellow-700 font-medium">There was an issue processing your payment.</span>
+      <span className="text-yellow-700 font-medium">{t("issue")}</span>
       <button onClick={() => setVisible(false)} className="ml-auto text-yellow-700 hover:text-yellow-600">&times;</button>
     </motion.div>
   );

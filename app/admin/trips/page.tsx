@@ -1,10 +1,10 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Eye, Sparkles } from "lucide-react";
 import { Sidebar, MobileSidebar } from "~/components/Sidebar";
-import { getAllTrips, requireAdmin } from "~/lib/actions";
+import { getAllTrips } from "~/lib/actions";
 import { DeleteTripButton } from "~/components/DeleteTripButton";
+import { getBookingCountByTrip } from "~/lib/actions";
 
 export const metadata = {
   title: "AI Trips | VoyageGH",
@@ -12,13 +12,14 @@ export const metadata = {
 };
 
 export default async function AdminTripsPage() {
-  try {
-    await requireAdmin();
-  } catch {
-    redirect("/");
-  }
-
   const allTrips = await getAllTrips();
+
+  const tripsWithBookings = await Promise.all(
+    allTrips.map(async (trip) => ({
+      ...trip,
+      bookingCount: await getBookingCountByTrip(trip.id),
+    }))
+  );
 
   return (
     <div className="admin-layout">
@@ -33,7 +34,7 @@ export default async function AdminTripsPage() {
               <p className="text-gray-100">Manage all AI-generated itineraries</p>
             </header>
 
-            {allTrips.length === 0 ? (
+            {tripsWithBookings.length === 0 ? (
               <div className="bg-white rounded-20 shadow-400 p-12 text-center">
                 <Sparkles size={48} className="mx-auto mb-4 text-primary-100 opacity-50" />
                 <p className="text-gray-100 text-lg">No trips generated yet.</p>
@@ -55,11 +56,12 @@ export default async function AdminTripsPage() {
                       <th className="text-left p-4 text-sm font-semibold text-dark-200">Style</th>
                       <th className="text-left p-4 text-sm font-semibold text-dark-200">Price</th>
                       <th className="text-left p-4 text-sm font-semibold text-dark-200">Duration</th>
+                      <th className="text-left p-4 text-sm font-semibold text-dark-200">Bookings</th>
                       <th className="text-right p-4 text-sm font-semibold text-dark-200">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {allTrips.map((trip) => (
+                    {tripsWithBookings.map((trip) => (
                       <tr key={trip.id} className="border-b border-light-400 hover:bg-light-200 transition-colors">
                         <td className="p-4">
                           <div className="flex items-center gap-3">
@@ -82,6 +84,7 @@ export default async function AdminTripsPage() {
                         <td className="p-4 text-sm text-gray-100">{trip.travelStyle}</td>
                         <td className="p-4 text-sm text-gray-100">{trip.estimatedPrice}</td>
                         <td className="p-4 text-sm text-gray-100">{trip.duration} days</td>
+                        <td className="p-4 text-sm text-gray-100">{trip.bookingCount}</td>
                         <td className="p-4 text-right">
                           <div className="flex items-center justify-end gap-2">
                             <Link

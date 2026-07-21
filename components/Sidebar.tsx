@@ -2,19 +2,21 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { LogOut } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { sidebarItems } from "~/lib/constants";
 import { SidebarAnimatedIcon } from "~/components/AnimatedIcon";
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { user } = useUser();
-  const isAdmin = user?.publicMetadata?.role === "admin";
+  const router = useRouter();
 
-  if (!isAdmin) return null;
+  const handleLogout = async () => {
+    await fetch("/api/admin/auth/logout", { method: "POST" });
+    router.push("/admin/login");
+  };
 
   return (
     <aside className="hidden lg:flex flex-col w-[270px] h-screen border-r border-light-100 bg-white">
@@ -45,21 +47,19 @@ export function Sidebar() {
             ))}
           </div>
           <div className="nav-footer">
-            {user?.imageUrl ? (
-              <Image src={user.imageUrl} alt="user" width={40} height={40} className="rounded-full" />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-white font-bold">
-                {user?.firstName?.charAt(0) || "A"}
-              </div>
-            )}
+            <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-white font-bold text-sm">
+              A
+            </div>
             <article className="flex flex-col gap-[2px] max-w-[115px]">
-              <h2 className="text-sm md:text-base font-semibold text-dark-200 truncate">
-                {user?.fullName || "Admin"}
-              </h2>
-              <p className="text-gray-100 text-xs md:text-sm font-normal truncate">
-                {user?.primaryEmailAddress?.emailAddress || ""}
-              </p>
+              <h2 className="text-sm md:text-base font-semibold text-dark-200 truncate">Admin</h2>
             </article>
+            <button
+              onClick={handleLogout}
+              className="ml-auto p-2 rounded-lg hover:bg-red-50 text-gray-100 hover:text-red-500 transition-colors"
+              title="Sign out"
+            >
+              <LogOut size={18} />
+            </button>
           </div>
         </div>
       </nav>
@@ -68,10 +68,13 @@ export function Sidebar() {
 }
 
 export function MobileSidebar() {
-  const { user } = useUser();
-  const isAdmin = user?.publicMetadata?.role === "admin";
+  const pathname = usePathname();
+  const router = useRouter();
 
-  if (!isAdmin) return null;
+  const handleLogout = async () => {
+    await fetch("/api/admin/auth/logout", { method: "POST" });
+    router.push("/admin/login");
+  };
 
   return (
     <div className="mobile-sidebar lg:hidden px-4 pt-4">
@@ -80,13 +83,23 @@ export function MobileSidebar() {
           <Image src="/assets/icons/logo.svg" alt="logo" width={24} height={24} />
           <h1 className="text-base font-bold text-dark-100">VoyageGH</h1>
         </Link>
+        <button
+          onClick={handleLogout}
+          className="p-2 rounded-lg hover:bg-red-50 text-gray-100 hover:text-red-500 transition-colors"
+          title="Sign out"
+        >
+          <LogOut size={18} />
+        </button>
       </header>
       <nav className="flex flex-col gap-3 pt-4">
         {sidebarItems.map((item) => (
           <Link
             key={item.id}
             href={item.href}
-            className="nav-item"
+            className={cn(
+              "nav-item",
+              pathname === item.href && "!bg-primary-100 !text-white"
+            )}
           >
             <SidebarAnimatedIcon name={item.icon} size={20} />
             <span>{item.label}</span>

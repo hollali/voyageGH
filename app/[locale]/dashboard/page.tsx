@@ -1,7 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { Search, Compass, BookOpen } from "lucide-react";
+import { getTranslations } from "next-intl/server";
+import { Link } from "~/lib/i18n/routing";
 import { Header } from "~/components/Header";
 import { Footer } from "~/components/Footer";
 import { getBookingsByUser } from "~/lib/actions";
@@ -22,17 +23,19 @@ export default async function UserDashboardPage(props: { searchParams?: Promise<
 
   const userBookings = await getBookingsByUser(userId);
 
+  const t = await getTranslations("dashboard");
+
   const dashCards = [
     {
       href: "/trips",
-      title: "Browse Trips",
-      description: "Explore AI-generated itineraries across Ghana",
+      title: t("browseTrips"),
+      description: t("browseDesc"),
       icon: <Compass size={20} className="text-primary-100" />,
     },
     {
       href: "/trips",
-      title: "Find a Trip",
-      description: "Discover AI-generated itineraries for your Ghana adventure",
+      title: t("findTrip"),
+      description: t("findDesc"),
       icon: <Search size={20} className="text-primary-100" />,
     },
   ];
@@ -44,8 +47,8 @@ export default async function UserDashboardPage(props: { searchParams?: Promise<
       <main className="wrapper py-10 flex-1">
         <div className="flex flex-col gap-10">
           <header className="flex flex-col gap-2">
-            <h1 className="p-30-bold text-dark-100">My Dashboard</h1>
-            <p className="text-gray-100 text-lg">Your trips and bookings</p>
+            <h1 className="p-30-bold text-dark-100">{t("title")}</h1>
+            <p className="text-gray-100 text-lg">{t("subtitle")}</p>
           </header>
 
           {paymentStatus && <PaymentAlert status={paymentStatus} />}
@@ -64,8 +67,8 @@ export default async function UserDashboardPage(props: { searchParams?: Promise<
             ))}
             <div className="bg-white p-6 rounded-20 shadow-400 flex flex-col gap-3">
               <BookOpen size={20} className="text-primary-100" />
-              <h3 className="p-18-semibold text-dark-100">My Bookings</h3>
-              <p className="text-sm text-gray-100">{userBookings.length} total bookings</p>
+              <h3 className="p-18-semibold text-dark-100">{t("myBookings")}</h3>
+              <p className="text-sm text-gray-100">{userBookings.length} {t("totalBookings")}</p>
             </div>
           </div>
 
